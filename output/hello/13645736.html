@@ -1,0 +1,936 @@
+<!DOCTYPE html><html lang="zh-cn"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="never">
+    <meta property="og:description" content="前言 本文已经发布视频点击查看 开发过程中，浏览器的调试非常重要，可以说是必备的技巧，本文我就会分享一些自己掌握的技巧，欢迎补充 我们默认使用Chrome浏览器，但是你使用新edge浏览器也是可以的 ">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>浏览器调试的必知必会，零基础足够详细-第一节console面板、移动端调试 - lookroot - 博客园</title>
+    <link id="favicon" rel="shortcut icon" href="//common.cnblogs.com/favicon.ico?v=20200522" type="image/x-icon">
+    
+    <link rel="stylesheet" href="/css/blog-common.min.css?v=7Pwqzj5EBy4dBv4DJNI181rFKP8_OF0hT7jO3o8jAa0">
+    <link id="MainCss" rel="stylesheet" href="/skins/codinglife/bundle-codinglife.min.css?v=UeHyLv1TT2WTz4TwfUOiMoKNmtFvLUjUnIhFE2UmZ7I">
+    
+    <link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="/skins/codinglife/bundle-codinglife-mobile.min.css?v=SvZrLLdL0Yyr-ovJQcaWHC38H7BnVchIqNQ1vj7VXFg">
+    
+    <link type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/lookroot/rss">
+    <link type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/lookroot/rsd.xml">
+    <link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/lookroot/wlwmanifest.xml">
+    <script async="" src="https://www.google-analytics.com/analytics.js"></script><script>
+        var currentBlogId = 548645;
+        var currentBlogApp = 'lookroot';
+        var cb_enable_mathjax = false;
+        var isLogined = false;
+        var isBlogOwner = false;
+        var skinName = 'CodingLife';
+        var visitorUserId = '';
+    </script>
+        <script>
+            var currentPostDateAdded = '2020-09-10 03:01';
+        </script>
+    <script src="https://common.cnblogs.com/scripts/jquery-2.2.0.min.js"></script>
+    <script src="/js/blog-common.min.js?v=ZMP-E7oivIbnbdC4Ap-FXPEUrs-k9WrJgvJkU43qwDI"></script>
+    
+    
+    
+<script src="https://securepubads.g.doubleclick.net/gpt/pubads_impl_2020090201.js" async=""></script><link rel="preload" href="https://adservice.google.com/adsid/integrator.js?domain=www.cnblogs.com" as="script"><script type="text/javascript" src="https://adservice.google.com/adsid/integrator.js?domain=www.cnblogs.com"></script><link rel="prefetch" href="https://71c6e66ac6499b949c44c043592370d8.safeframe.googlesyndication.com/safeframe/1-0-37/html/container.html"><link rel="prefetch" href="https://tpc.googlesyndication.com/safeframe/1-0-37/html/container.html"></head>
+<body>
+    <a name="top"></a>
+    
+    
+<!--done-->
+<div id="home">
+<div id="header">
+	<div id="blogTitle">
+        <a id="lnkBlogLogo" href="https://www.cnblogs.com/lookroot/"><img id="blogLogo" src="/skins/custom/images/logo.gif" alt="返回主页"></a>		
+		
+<!--done-->
+<h1><a id="Header1_HeaderTitle" class="headermaintitle HeaderMainTitle" href="https://www.cnblogs.com/lookroot/">lookroot</a>
+</h1>
+<h2>
+
+</h2>
+
+
+
+
+		
+	</div><!--end: blogTitle 博客的标题和副标题 -->
+	<div id="navigator">
+		
+<ul id="navList">
+<li><a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">
+博客园</a>
+</li>
+<li>
+<a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/lookroot/">
+首页</a>
+</li>
+<li>
+
+<a id="blog_nav_newpost" class="menu" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">
+新随笔</a>
+</li>
+<li>
+<a id="blog_nav_contact" class="menu" href="https://msg.cnblogs.com/send/lookroot">
+联系</a></li>
+<li>
+<a id="blog_nav_rss" class="menu" href="javascript:void(0)" data-rss="https://www.cnblogs.com/lookroot/rss/">
+订阅</a>
+<!--<partial name="./Shared/_XmlLink.cshtml" model="Model" /></li>--></li>
+<li>
+<a id="blog_nav_admin" class="menu" href="https://i.cnblogs.com/">
+管理</a>
+</li>
+</ul>
+
+
+		<div class="blogStats">
+			
+			<span id="stats_post_count">随笔 - 
+25&nbsp; </span>
+<span id="stats_article_count">文章 - 
+0&nbsp; </span>
+<span id="stats-comment_count">评论 - 
+5</span>
+
+			
+		</div><!--end: blogStats -->
+	</div><!--end: navigator 博客导航栏 -->
+</div><!--end: header 头部 -->
+
+<div id="main">
+	<div id="mainContent">
+	<div class="forFlow">
+		<div id="post_detail">
+    <!--done-->
+    <div id="topics">
+        <div class="post">
+            <h1 class="postTitle">
+                
+<a id="cb_post_title_url" class="postTitle2 vertical-middle" href="https://www.cnblogs.com/lookroot/p/13645736.html">
+    <span>浏览器调试的必知必会，零基础足够详细-第一节console面板、移动端调试</span>
+    
+
+
+</a>
+
+            </h1>
+            <div class="clear"></div>
+            <div class="postBody">
+                
+<div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+    <h2 id="前言">前言</h2>
+<p>本文已经发布视频<a href="https://www.bilibili.com/video/BV1xv411172j/">点击查看</a></p>
+<p>开发过程中，浏览器的调试非常重要，可以说是必备的技巧，本文我就会分享一些自己掌握的技巧，欢迎补充</p>
+<p>我们默认使用Chrome浏览器，但是你使用新edge浏览器也是可以的</p>
+<p>在开发者界面中，你可以使用<code>ctrl + shift +P</code>打开快捷输入运行常用命令，这和mac上的非常相似</p>
+<p><img src="https://img.lookroot.cn/blog/202008/26/095122-290705.png" alt="image-20200826095121905" loading="lazy"></p>
+<p>也可以点击此处查看更多<a href="https://developers.google.cn/web/tools/chrome-devtools/">官方文档</a></p>
+<h2 id="界面">界面</h2>
+<p>点击<strong>Dock side</strong>可以切换控制台显示位置，点击1.可以打开控制台设置</p>
+<p><img src="https://img.lookroot.cn/blog/202008/25/123900-566614.png" alt="image-20200825123859815" loading="lazy"></p>
+<p>在设置页面的<strong>appearance</strong>中可以进行更多的页面设置</p>
+<p><img src="https://img.lookroot.cn/blog/202008/25/124036-430334.png" alt="image-20200825124034834" loading="lazy"></p>
+<h2 id="快捷键">快捷键</h2>
+<p>很多人去百度快捷键，完全没有必要啊</p>
+<p><img src="https://img.lookroot.cn/blog/202008/25/121254-566893.png" alt="image-20200825121254108" loading="lazy"></p>
+<p><img src="https://img.lookroot.cn/blog/202008/25/121220-571395.png" alt="image-20200825121219893" loading="lazy"></p>
+<h2 id="移动设备调试">移动设备调试</h2>
+<p>点击切换到1.移动端预览，点击左上角的2.responsive可以切换到响应式窗口，此时你可以通过2.1、2.2、2.3来拖动修改窗口大小，也可以通过3.直接输入窗口大小，可以通过4.修改窗口比，左上角还提供了非常多的机型选择，还可以通过5.来添加更多的机型</p>
+<p><img src="https://img.lookroot.cn/blog/202008/25/123018-554267.png" alt="image-20200825123017728" loading="lazy"></p>
+<p>如果你的网络允许，能访问（不存在的网站），当你选择机型的时候，浏览器还会自动生成手机壳，点击1.可以切换手机壳的显示，点击2.可以打开尺子，点击3.可以截取当前屏幕，点击4.可以截取当前整个页面长图，点击5.可以恢复到默认设置</p>
+<p><img src="https://img.lookroot.cn/blog/202008/25/123605-562992.png" alt="image-20200825123605371" loading="lazy"></p>
+<h2 id="console控制台">console控制台</h2>
+<p>console其实就是浏览器的一个可交互命令行，用来输出调试信息和脚本执行</p>
+<p>如果你想要在控制台输入换行可以使用<code>shift + enter</code></p>
+<p>你可以点击左方区域来切换对应的显示，点击1.设置一个动态表达式来监听，2.过滤输出，3.清空，右方可以设置一些需要输出的信息</p>
+<p><img src="https://img.lookroot.cn/blog/202008/26/110452-422161.png" alt="image-20200826110450596" loading="lazy"></p>
+<h3 id="选择器">$选择器</h3>
+<p>是的在浏览器控制台中你可以获得jQuery的选择器体验</p>
+<p>我们随便选择一个节点，这里是一个小技巧，可以直接复制节点的选择器</p>
+<p><img src="https://img.lookroot.cn/blog/202008/26/123457-371238.png" alt="image-20200826123456823" loading="lazy"></p>
+<p><img src="https://img.lookroot.cn/blog/202008/26/123553-87415.png" alt="image-20200826123552887" loading="lazy"></p>
+<h3 id="动态表达式">动态表达式</h3>
+<p>点击1.这个小眼睛，可以输入一些JavaScript表达式，比如我们输入<code>Date.now();</code>,就会一直监控时间的变化了</p>
+<p><img src="https://img.lookroot.cn/blog/202008/26/110808-395131.png" alt="image-20200826110807793" loading="lazy"></p>
+<p>用这个方式我们可以监听页面的某一个节点的变化</p>
+<pre><code class="language-javascript hljs">monitorEvents($(<span class="hljs-string">"#app &gt; div.page-title &gt; h1"</span>))
+</code></pre>
+<p>然后我们将鼠标放置到这个节点上方，就可以监听并打印出对应的事件了</p>
+<p><img src="https://img.lookroot.cn/blog/202008/26/120604-119160.png" alt="image-20200826120603913" loading="lazy"></p>
+<p>你还可以指定要监听的事件<code>monitorEvents($("#app &gt; div.page-title &gt; h1"),['focus'])</code></p>
+<p><code>monitor</code>还有更多的用法</p>
+<pre><code class="language-javascript hljs"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">sum</span>(<span class="hljs-params">x, y</span>) </span>{
+      <span class="hljs-keyword">return</span> x + y;
+  }
+monitor(sum);
+</code></pre>
+<p><img src="https://img.lookroot.cn/blog/202008/26/155903-712952.png" alt="image-20200826155903223" loading="lazy"></p>
+<h3 id="基本的打印">基本的打印</h3>
+<pre><code class="language-javascript hljs"><span class="hljs-built_in">console</span>.log(<span class="hljs-string">"log"</span>);
+<span class="hljs-built_in">console</span>.info(<span class="hljs-string">"info"</span>);
+<span class="hljs-built_in">console</span>.error(<span class="hljs-string">"error"</span>);
+<span class="hljs-built_in">console</span>.warn(<span class="hljs-string">"warn"</span>);
+</code></pre>
+<p><img src="https://img.lookroot.cn/blog/202008/26/101243-540085.png" alt="image-20200826101241931" loading="lazy"></p>
+<h3 id="assert">assert</h3>
+<p>当值为false的时候会触发打印</p>
+<pre><code class="language-javascript hljs"><span class="hljs-keyword">var</span> result = <span class="hljs-literal">false</span>;
+<span class="hljs-built_in">console</span>.assert(result, <span class="hljs-string">'result is false'</span>);
+</code></pre>
+<h3 id="占位符">占位符</h3>
+<pre><code class="language-javascript hljs"><span class="hljs-built_in">console</span>.log(<span class="hljs-string">'%cover'</span>,<span class="hljs-string">'color:red;font-size:48px'</span>);
+# c是样式占位符
+<span class="hljs-built_in">console</span>.log(<span class="hljs-string">'name:%s'</span>,<span class="hljs-string">'lookroot'</span>)
+</code></pre>
+<p><img src="https://img.lookroot.cn/blog/202008/26/122647-468421.png" alt="image-20200826122647052" loading="lazy"></p>
+<h3 id="统计时间">统计时间</h3>
+<pre><code class="language-javascript hljs"><span class="hljs-built_in">console</span>.time(<span class="hljs-string">"执行时间"</span>);
+<span class="hljs-keyword">for</span>(<span class="hljs-keyword">let</span> x=<span class="hljs-number">0</span>;x&lt;<span class="hljs-number">100000000</span>;x++){}
+<span class="hljs-built_in">console</span>.timeEnd(<span class="hljs-string">"执行时间"</span>);
+</code></pre>
+<p><img src="https://img.lookroot.cn/blog/202008/26/123305-128327.png" alt="image-20200826123304043" loading="lazy"></p>
+<h3 id="以表格方式打印">以表格方式打印</h3>
+<pre><code class="language-javascript hljs"><span class="hljs-keyword">var</span> userlist=[{<span class="hljs-attr">name</span>:<span class="hljs-string">'lookroot'</span>,<span class="hljs-attr">age</span>:<span class="hljs-number">21</span>},{<span class="hljs-attr">name</span>:<span class="hljs-string">'lili'</span>,<span class="hljs-attr">age</span>:<span class="hljs-number">18</span>}]
+<span class="hljs-built_in">console</span>.table(userlist)
+</code></pre>
+<p><img src="https://img.lookroot.cn/blog/202008/26/121026-588200.png" alt="image-20200826121025999" loading="lazy"></p>
+<h3 id="转化为对象打印更方便">转化为对象打印更方便</h3>
+<p>在日常开发中我们为了知道数据是谁输出的，需要给打印语句写一个tag</p>
+<pre><code class="language-javascript hljs"><span class="hljs-keyword">var</span> username=<span class="hljs-string">"lookroot"</span>;
+<span class="hljs-built_in">console</span>.log(<span class="hljs-string">"username:"</span>+username);
+</code></pre>
+<p>其实可以直接转化为对象更为方便</p>
+<pre><code class="language-javascript hljs"><span class="hljs-built_in">console</span>.log({username})
+</code></pre>
+<p><img src="https://img.lookroot.cn/blog/202008/26/155022-338854.png" alt="image-20200826155019935" loading="lazy"></p>
+<h3 id="分组打印">分组打印</h3>
+<pre><code class="language-javascript hljs"><span class="hljs-built_in">console</span>.group(<span class="hljs-string">"分组1"</span>);
+<span class="hljs-built_in">console</span>.log(<span class="hljs-string">"1.1"</span>);
+<span class="hljs-built_in">console</span>.log(<span class="hljs-string">"1.2"</span>);
+<span class="hljs-built_in">console</span>.groupEnd();
+<span class="hljs-built_in">console</span>.group(<span class="hljs-string">"分组2"</span>);
+<span class="hljs-built_in">console</span>.log(<span class="hljs-string">"2.1"</span>);
+<span class="hljs-built_in">console</span>.log(<span class="hljs-string">"2.2"</span>);
+<span class="hljs-built_in">console</span>.groupEnd();
+</code></pre>
+<p><img src="https://img.lookroot.cn/blog/202008/26/121335-261416.png" alt="image-20200826121334813" loading="lazy"></p>
+<h3 id="dir完整打印">dir完整打印</h3>
+<p>如果你需要关注一个节点的完整属性可以使用dir打印，这里要介绍第二个小技巧，点击<code>store as global variable</code>可以将这个节点作为全局属性，就不用再通过选择器去获取它了</p>
+<p><img src="https://img.lookroot.cn/blog/202008/26/140446-176874.png" alt="image-20200826140443537" loading="lazy"></p>
+<p>点击以后，会生成一个template..的属性，此时只需要打印这个属性名就可以直接打印这个节点了</p>
+<p><img src="https://img.lookroot.cn/blog/202008/26/140640-93224.png" alt="image-20200826140634615" loading="lazy"></p>
+<h3 id="自定义打印">自定义打印</h3>
+<p>如果上面的打印都还不能满足你的需求，Chrome允许你自定义你的打印格式</p>
+<p><img src="https://img.lookroot.cn/blog/202008/26/135617-985854.png" alt="image-20200826135616273" loading="lazy"></p>
+<pre><code class="language-javascript hljs"><span class="hljs-built_in">window</span>.devtoolsFormatters = [{
+    <span class="hljs-attr">header</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
+        <span class="hljs-keyword">if</span> (data.isRed) {
+           <span class="hljs-keyword">return</span> [<span class="hljs-string">'div'</span>,{<span class="hljs-attr">style</span>: <span class="hljs-string">"color: red;"</span>}, data.msg] 
+        }
+    },
+    <span class="hljs-attr">hasBody</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+    }
+}]
+</code></pre>
+<p>我们要使用它非常简单</p>
+<pre><code class="language-javascript hljs"><span class="hljs-built_in">console</span>.log({<span class="hljs-attr">isRed</span>:<span class="hljs-literal">true</span>,<span class="hljs-attr">data</span>:<span class="hljs-string">"red console"</span>})
+</code></pre>
+<p>还可以进一步封装一下</p>
+<pre><code class="language-javascript hljs"><span class="hljs-built_in">console</span>.red=<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{
+    <span class="hljs-built_in">console</span>.log({<span class="hljs-attr">isRed</span>:<span class="hljs-literal">true</span>,<span class="hljs-attr">msg</span>:data})
+}
+</code></pre>
+<p><img src="https://img.lookroot.cn/blog/202008/26/154243-392220.png" alt="image-20200826154242366" loading="lazy"></p>
+<p>更多内容可以查看我的<a href="https://www.lookroot.cn/">个人博客</a></p>
+
+</div>
+<div id="MySignature"></div>
+<div class="clear"></div>
+<div id="blog_post_info_block"><div id="BlogPostCategory">
+    分类: 
+            <a href="https://www.cnblogs.com/lookroot/category/1773046.html" target="_blank">教程</a></div>
+<div id="EntryTag">
+    标签: 
+            <a href="https://www.cnblogs.com/lookroot/tag/%E5%89%8D%E7%AB%AF/">前端</a>,             <a href="https://www.cnblogs.com/lookroot/tag/chrome/">chrome</a>,             <a href="https://www.cnblogs.com/lookroot/tag/JavaScript/">JavaScript</a></div>
+
+    <div id="blog_post_info">
+<div id="green_channel">
+        <a href="javascript:void(0);" id="green_channel_digg" onclick="DiggIt(13645736,cb_blogId,1);green_channel_success(this,'谢谢推荐！');">好文要顶</a>
+        <a id="green_channel_follow" onclick="follow('e0075cd9-188b-4fcf-ba49-08d7431a305b');" href="javascript:void(0);">关注我</a>
+    <a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a>
+    <a id="green_channel_weibo" href="javascript:void(0);" title="分享至新浪微博" onclick="ShareToTsina()"><img src="https://common.cnblogs.com/images/icon_weibo_24.png" alt=""></a>
+    <a id="green_channel_wechat" href="javascript:void(0);" title="分享至微信" onclick="shareOnWechat()"><img src="https://common.cnblogs.com/images/wechat.png" alt=""></a>
+</div>
+<div id="author_profile">
+    <div id="author_profile_info" class="author_profile_info">
+            <a href="https://home.cnblogs.com/u/lookroot/" target="_blank"><img src="https://pic.cnblogs.com/face/1821466/20190929192634.png" class="author_avatar" alt=""></a>
+        <div id="author_profile_detail" class="author_profile_info">
+            <a href="https://home.cnblogs.com/u/lookroot/">lookroot</a><br>
+            <a href="https://home.cnblogs.com/u/lookroot/followees/">关注 - 0</a><br>
+            <a href="https://home.cnblogs.com/u/lookroot/followers/">粉丝 - 0</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="author_profile_honor"></div>
+    <div id="author_profile_follow">
+                <a href="javascript:void(0);" onclick="follow('e0075cd9-188b-4fcf-ba49-08d7431a305b');return false;">+加关注</a>
+    </div>
+</div>
+<div id="div_digg">
+    <div class="diggit" onclick="votePost(13645736,'Digg')">
+        <span class="diggnum" id="digg_count">1</span>
+    </div>
+    <div class="buryit" onclick="votePost(13645736,'Bury')">
+        <span class="burynum" id="bury_count">0</span>
+    </div>
+    <div class="clear"></div>
+    <div class="diggword" id="digg_tips">
+    </div>
+</div>
+
+<script type="text/javascript">
+    currentDiggType = 0;
+</script></div>
+    <div class="clear"></div>
+    <div id="post_next_prev">
+
+    <a href="https://www.cnblogs.com/lookroot/p/13546941.html" class="p_n_p_prefix">« </a> 上一篇：    <a href="https://www.cnblogs.com/lookroot/p/13546941.html" title="发布于 2020-08-22 20:16">盘点不怎么熟悉但十分有趣的html标签</a>
+    <br>
+    <a href="https://www.cnblogs.com/lookroot/p/13645758.html" class="p_n_p_prefix">» </a> 下一篇：    <a href="https://www.cnblogs.com/lookroot/p/13645758.html" title="发布于 2020-09-10 15:04">浏览器调试的必知必会，零基础足够详细-第二节Elements元素面板</a>
+
+</div>
+</div>
+            </div>
+            <div class="postDesc">posted @ 
+<span id="post-date">2020-09-10 15:01</span>&nbsp;
+<a href="https://www.cnblogs.com/lookroot/">lookroot</a>&nbsp;
+阅读(<span id="post_view_count">215</span>)&nbsp;
+评论(<span id="post_comment_count">0</span>)&nbsp;
+<a href="https://i.cnblogs.com/EditPosts.aspx?postid=13645736" rel="nofollow">编辑</a>&nbsp;
+<a href="javascript:void(0)" onclick="AddToWz(13645736);return false;">收藏</a></div>
+        </div>
+	    
+	    
+    </div><!--end: topics 文章、评论容器-->
+</div>
+<script src="https://common.cnblogs.com/highlight/9.12.0/highlight.min.js"></script>
+<script>markdown_highlight();</script>
+<script>
+    var allowComments = true, cb_blogId = 548645, cb_blogApp = 'lookroot', cb_blogUserGuid = 'e0075cd9-188b-4fcf-ba49-08d7431a305b';
+    var cb_entryId = 13645736, cb_entryCreatedDate = '2020-09-10 15:01', cb_postType = 1;
+    loadViewCount(cb_entryId);
+</script><a name="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<script>
+    var commentManager = new blogCommentManager();
+    commentManager.renderComments(0);
+</script>
+<div id="comment_form" class="commentform">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav"><span id="span_refresh_tips"></span><a href="javascript:void(0);" onclick="return RefreshCommentList();" id="lnk_RefreshComments" runat="server" clientidmode="Static">刷新评论</a><a href="#" onclick="return RefreshPage();">刷新页面</a><a href="#top">返回顶部</a></div>
+    <div id="comment_form_container" style="visibility: visible;"><div class="login_tips">
+    注册用户登录后才能发表评论，请 
+    <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return login('commentform');">登录</a>
+     或 
+    <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return register();">注册</a>，
+    <a href="https://www.cnblogs.com/">访问</a> 网站首页。
+</div></div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+    <div id="ad_t2"><a href="http://www.ucancode.com/index.htm" target="_blank" onclick="ga('send', 'event', 'Link', 'click', 'T2-ucancode')">【推荐】超50万行VC++源码: 大型组态工控、电力仿真CAD与GIS源码库</a><br><a href="https://developer.aliyun.com/article/771503?utm_content=g_1000177923" target="_blank" onclick="ga('send', 'event', 'Link', 'click', 'T2-阿里云3天训练营')">【推荐】7天蜕变！阿里云专家免费授课，名额有限！</a><br><a href="https://developer.aliyun.com/learning/trainingcamp/holo/1?utm_content=g_1000179015" target="_blank" onclick="ga('send', 'event', 'Link', 'click', 'T2-阿里云Holo训练营')">【推荐】5天实战！技术大咖带你玩转实时数仓，赢定制T恤</a><br><a href="https://developer.aliyun.com/learning/trainingcamp/emr/1?utm_content=g_1000179016" target="_blank" onclick="ga('send', 'event', 'Link', 'click', 'T2-阿里云EMR训练营')">【推荐】学习上云只需4天？0基础上手EMR，助力轻松上云</a><br><a href="https://activity.huaweicloud.com/828_promotion/index.html?bpName=05e3f29d380010e40fffc0040d9a2660&amp;bindType=1" target="_blank" onclick="ga('send', 'event', 'Link', 'click', 'T2-杭云')">【推荐】828企业上云节，亿元上云补贴，华为云更懂企业</a><br><a href="https://developer.aliyun.com/article/714279?utm_content=g_1000088939" target="_blank" onclick="ga('send', 'event', 'Link', 'click', 'T2-阿里云开发者社区')">【推荐】阿里毕玄16篇文章，深度讲解Java开发、系统设计、职业发展</a><br></div>
+    <div id="opt_under_post"></div>
+    <div id="cnblogs_c1" class="c_ad_block">
+        <div id="div-gpt-ad-1592365906576-0" style="width: 300px; height: 250px;" data-google-query-id="CLevo6qs3usCFRjOTAId1RILww"><div id="google_ads_iframe_/1090369/C1_0__container__" style="border: 0pt none;"><iframe id="google_ads_iframe_/1090369/C1_0" title="3rd party ad content" name="google_ads_iframe_/1090369/C1_0" width="300" height="250" scrolling="no" marginwidth="0" marginheight="0" frameborder="0" sandbox="allow-forms allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-top-navigation-by-user-activation" srcdoc="" style="border: 0px; vertical-align: bottom;" data-google-container-id="1" data-load-complete="true"></iframe></div></div>
+    </div>
+    <div id="under_post_news" style="display: none;"></div>
+    <div id="cnblogs_c2" class="c_ad_block">
+        <div id="div-gpt-ad-1592366332455-0" style="width: 468px; height: 60px;" data-google-query-id="CILVoqqs3usCFRjOTAId1RILww"><div id="google_ads_iframe_/1090369/C2_0__container__" style="border: 0pt none;"><iframe id="google_ads_iframe_/1090369/C2_0" title="3rd party ad content" name="google_ads_iframe_/1090369/C2_0" width="468" height="60" scrolling="no" marginwidth="0" marginheight="0" frameborder="0" sandbox="allow-forms allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-top-navigation-by-user-activation" srcdoc="" style="border: 0px; vertical-align: bottom;" data-google-container-id="2" data-load-complete="true"></iframe></div></div>
+    </div>
+    <div id="under_post_kb">
+<div class="itnews c_ad_block">
+    <b>最新 IT 新闻</b>:
+    <br>
+ ·          <a href="//news.cnblogs.com/n/672587/" target="_blank">Google Play 下架开源邮件客户端 K-9 Mail</a>
+        <br>
+ ·          <a href="//news.cnblogs.com/n/672588/" target="_blank">补贴继续，小度TWS智能耳机已在路上</a>
+        <br>
+ ·          <a href="//news.cnblogs.com/n/672586/" target="_blank">引力假说可能无法解释量子态坍缩</a>
+        <br>
+ ·          <a href="//news.cnblogs.com/n/672585/" target="_blank">三星Galaxy Z Fold2 5G上手：这才是我们想要的折叠屏手机</a>
+        <br>
+ ·          <a href="//news.cnblogs.com/n/672584/" target="_blank">系统之外，400万外卖骑手在这个社区吹水吐槽</a>
+        <br>
+    » <a href="https://news.cnblogs.com/" title="IT 新闻" target="_blank">更多新闻...</a>
+</div></div>
+    <div id="HistoryToday" class="c_ad_block"></div>
+    <script type="text/javascript">
+        fixPostBody();
+        deliverBigBanner();
+setTimeout(function() { incrementViewCount(cb_entryId); }, 50);        deliverT2();
+        deliverC1C2();
+        loadNewsAndKb();
+        loadBlogSignature();
+LoadPostCategoriesTags(cb_blogId, cb_entryId);        LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+        GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+        loadOptUnderPost();
+        GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+    </script>
+</div>
+	</div><!--end: forFlow -->
+	</div><!--end: mainContent 主体内容容器-->
+
+	<div id="sideBar">
+		<div id="sideBarMain">
+			
+<div id="sidebar_news" class="newsItem"><!--done-->
+<h3 class="catListTitle">公告</h3>
+
+<div id="blog-news">
+    我的个人公众号欢迎关注:
+
+<img src="https://www.lookroot.cn/assets/img/weixin.43f8de83.jpg" width="100%">
+
+<a href="https://www.lookroot.cn/">我的个人网站</a><a href="https://space.bilibili.com/10433048">我的bilibili空间</a>
+    <div id="profile_block">
+        昵称：
+        <a href="https://home.cnblogs.com/u/lookroot/">
+            lookroot
+        </a>
+        <br>
+        园龄：
+        <a href="https://home.cnblogs.com/u/lookroot/" title="入园时间：2019-09-29">
+            11个月
+        </a>
+        <br>
+        粉丝：
+        <a href="https://home.cnblogs.com/u/lookroot/followers/">
+            0
+        </a>
+        <br>
+        关注：
+        <a href="https://home.cnblogs.com/u/lookroot/followees/">
+            0
+        </a>
+        <div id="p_b_follow">
+<a href="javascript:void(0)" onclick="follow('e0075cd9-188b-4fcf-ba49-08d7431a305b')">+加关注</a></div>
+        <script>getFollowStatus('e0075cd9-188b-4fcf-ba49-08d7431a305b');</script>
+    </div>
+</div>
+
+</div>
+
+<div id="sidebar_ad"></div>
+			<div id="blog-calendar" style="">
+
+<table id="blogCalendar" class="Cal" cellspacing="0" cellpadding="0" title="Calendar" border="0">
+    <tbody>
+        <tr>
+            <td colspan="7">
+                <table class="CalTitle" cellspacing="0" border="0">
+                    <tbody>
+                        <tr>
+                            <td class="CalNextPrev">
+                                <a href="javascript:void(0);" onclick="loadBlogCalendar('2020/08/10'); return false;">&lt;</a>
+                            </td>
+                            <td align="center">2020年9月</td>
+                            <td align="right" class="CalNextPrev">
+                                <a href="javascript:void(0);" onclick="loadBlogCalendar('2020/10/10'); return false;">&gt;</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    <tr>
+        <th class="CalDayHeader" align="center" abbr="日" scope="col">日</th>
+        <th class="CalDayHeader" align="center" abbr="一" scope="col">一</th>
+        <th class="CalDayHeader" align="center" abbr="二" scope="col">二</th>
+        <th class="CalDayHeader" align="center" abbr="三" scope="col">三</th>
+        <th class="CalDayHeader" align="center" abbr="四" scope="col">四</th>
+        <th class="CalDayHeader" align="center" abbr="五" scope="col">五</th>
+        <th class="CalDayHeader" align="center" abbr="六" scope="col">六</th>
+    </tr>
+            <tr>
+                            <td class="CalOtherMonthDay" align="center">30</td>
+                            <td class="CalOtherMonthDay" align="center">31</td>
+                        <td class="" align="center">
+                            1
+                        </td>
+                        <td class="" align="center">
+                            2
+                        </td>
+                        <td class="" align="center">
+                            3
+                        </td>
+                        <td class="" align="center">
+                            4
+                        </td>
+                    <td class="CalWeekendDay" align="center">
+                        5
+                    </td>
+            </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            6
+                        </td>
+                            <td class="" align="center">
+                                7
+                            </td>
+                            <td class="" align="center">
+                                8
+                            </td>
+                            <td class="" align="center">
+                                9
+                            </td>
+                            <td class="CalTodayDay" align="center">
+                                <a href="https://www.cnblogs.com/lookroot/archive/2020/09/10.html"><u>10</u></a>
+                            </td>
+                            <td class="" align="center">
+                                11
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            12
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            13
+                        </td>
+                            <td class="" align="center">
+                                14
+                            </td>
+                            <td class="" align="center">
+                                15
+                            </td>
+                            <td class="" align="center">
+                                16
+                            </td>
+                            <td class="" align="center">
+                                17
+                            </td>
+                            <td class="" align="center">
+                                18
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            19
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            20
+                        </td>
+                            <td class="" align="center">
+                                21
+                            </td>
+                            <td class="" align="center">
+                                22
+                            </td>
+                            <td class="" align="center">
+                                23
+                            </td>
+                            <td class="" align="center">
+                                24
+                            </td>
+                            <td class="" align="center">
+                                25
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            26
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            27
+                        </td>
+                            <td class="" align="center">
+                                28
+                            </td>
+                            <td class="" align="center">
+                                29
+                            </td>
+                            <td class="" align="center">
+                                30
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                1
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                2
+                            </td>
+                        <td class="CalOtherMonthDay" align="center">
+                            3
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalOtherMonthDay" align="center">
+                            4
+                        </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                5
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                6
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                7
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                8
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                9
+                            </td>
+                        <td class="CalOtherMonthDay" align="center">
+                            10
+                        </td>
+                </tr>
+    </tbody>
+</table></div><script>loadBlogDefaultCalendar();</script>
+			
+			<div id="leftcontentcontainer">
+				<div id="blog-sidecolumn">
+<!-- 搜索 -->
+<div id="sidebar_search" class="sidebar-block">
+    <div id="sidebar_search" class="mySearch">
+        <h3 class="catListTitle">搜索</h3>
+        <div id="sidebar_search_box">
+            <div id="widget_my_zzk" class="div_my_zzk">
+                <input type="text" id="q" onkeydown="return zzk_go_enter(event);" class="input_my_zzk">&nbsp;<input onclick="zzk_go()" type="button" value="找找看" id="btnZzk" class="btn_my_zzk">
+            </div>
+            <div id="widget_my_google" class="div_my_zzk">
+                <input type="text" name="google_q" id="google_q" onkeydown="return google_go_enter(event);" class="input_my_zzk">&nbsp;<input onclick="google_go()" type="button" value="谷歌搜索" class="btn_my_zzk">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 常用链接 -->
+<div id="sidebar_shortcut" class="sidebar-block">
+    <div class="catListLink">
+<h3 class="catListTitle">
+常用链接
+</h3>
+<ul>
+    
+<li><a href="https://www.cnblogs.com/lookroot/p/" title="我的博客的随笔列表">我的随笔</a></li>
+<li><a href="https://www.cnblogs.com/lookroot/MyComments.html" title="我的发表过的评论列表">我的评论</a></li>
+<li><a href="https://www.cnblogs.com/lookroot/OtherPosts.html" title="我评论过的随笔列表">我的参与</a></li>
+<li><a href="https://www.cnblogs.com/lookroot/RecentComments.html" title="我的博客的评论列表">最新评论</a></li>
+<li><a href="https://www.cnblogs.com/lookroot/tag/" title="我的博客的标签列表">我的标签</a></li>
+
+</ul>
+</div>
+
+
+</div>
+
+<!-- 最新随笔 -->
+
+
+
+<!-- 我的标签 -->
+<div id="sidebar_toptags" class="sidebar-block">
+    <div class="catListTag">
+<h3 class="catListTitle">我的标签</h3>
+<ul>
+
+        <li>
+            <a href="https://www.cnblogs.com/lookroot/tag/JavaScript/">JavaScript</a>(4)
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/lookroot/tag/vue/">vue</a>(3)
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/lookroot/tag/chrome/">chrome</a>(2)
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/lookroot/tag/html/">html</a>(1)
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/lookroot/tag/java/">java</a>(1)
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/lookroot/tag/php/">php</a>(1)
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/lookroot/tag/%E5%A5%BD%E8%BD%AF/">好软</a>(1)
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/lookroot/tag/%E6%B5%8F%E8%A7%88%E5%99%A8/">浏览器</a>(1)
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/lookroot/tag/%E5%89%8D%E7%AB%AF/">前端</a>(1)
+        </li>
+    
+
+</ul>
+</div>
+
+
+</div>
+
+<!-- 积分与排名 -->
+
+
+<!-- 随笔分类、随笔档案、文章分类、新闻分类、相册、链接 -->
+<div id="sidebar_categories">
+    
+        <div id="sidebar_postcategory" class="catListPostCategory sidebar-block">
+            <h3 class="catListTitle">
+                
+随笔分类
+
+
+
+            </h3>
+
+
+            <ul>
+
+                        <li>
+                            
+<a href="https://www.cnblogs.com/lookroot/category/1774154.html" rel="" target="">
+    vue教程(15)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/lookroot/category/1773036.html" rel="" target="">
+    编程故事(2)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/lookroot/category/1805100.html" rel="" target="">
+    好软推荐(1)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/lookroot/category/1773046.html" rel="" target="">
+    教程(8)
+</a>
+ 
+
+                        </li>
+
+            </ul>
+
+
+        </div>
+        <div id="sidebar_postarchive" class="catListPostArchive sidebar-block">
+            <h3 class="catListTitle">
+                
+随笔档案
+
+
+
+            </h3>
+
+
+            <ul>
+
+                        <li>
+                            
+<a href="https://www.cnblogs.com/lookroot/archive/2020/09.html" rel="" target="">
+    2020年9月(2)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/lookroot/archive/2020/08.html" rel="" target="">
+    2020年8月(1)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/lookroot/archive/2020/07.html" rel="" target="">
+    2020年7月(1)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/lookroot/archive/2020/06.html" rel="" target="">
+    2020年6月(15)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/lookroot/archive/2020/05.html" rel="" target="">
+    2020年5月(6)
+</a>
+ 
+
+                        </li>
+
+            </ul>
+
+
+        </div>
+
+</div>
+
+<!-- 最新评论 -->
+<div id="sidebar_recentcomments" class="sidebar-block">
+    <div class="catListComment">
+<h3 class="catListTitle">最新评论</h3>
+
+	<div class="RecentCommentBlock">
+        <ul>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/lookroot/p/12958067.html">1. Re:PHP还是世界上最好的语言吗</a></li>
+                    <li class="recent_comment_body">我们这些小人物有什么资格去议论一个语言的兴衰呢？这些产物说到底还是资本角逐的结果，我&gt;&gt;们在这个过程中无非就是充当一个工具的角色 学编程又何尝不是一个在学习做人的过程呢？ 哈哈哈...</li>
+                    <li class="recent_comment_author">--老豆浆</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/lookroot/p/13204348.html">2. Re:webpack的入门实践，看这篇就够了</a></li>
+                    <li class="recent_comment_body"><p>666</p>
+</li>
+                    <li class="recent_comment_author">--Ajanuw</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/lookroot/p/12958148.html">3. Re:vue3.0 beta已出，来快速实践一下吧</a></li>
+                    <li class="recent_comment_body">@普通男孩 这些ui库都还么有做适配的...</li>
+                    <li class="recent_comment_author">--lookroot</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/lookroot/p/12958148.html">4. Re:vue3.0 beta已出，来快速实践一下吧</a></li>
+                    <li class="recent_comment_body"><p>想装个vant 装完就报错了...看来我还是太菜</p>
+</li>
+                    <li class="recent_comment_author">--普通男孩</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/lookroot/p/12958148.html">5. Re:vue3.0 beta已出，来快速实践一下吧</a></li>
+                    <li class="recent_comment_body"><p>感觉还是有bug,页面出来以后 有两个div id都是app</p>
+</li>
+                    <li class="recent_comment_author">--普通男孩</li>
+        </ul>
+    </div>
+</div>
+
+
+</div>
+
+
+
+<!-- 阅读排行榜 -->
+<div id="sidebar_topviewedposts" class="sidebar-block">
+    <div class="catListView">
+<h3 class="catListTitle">阅读排行榜</h3>
+	<div id="TopViewPostsBlock">
+        <ul style="word-break:break-all">
+                    <li>
+                        <a href="https://www.cnblogs.com/lookroot/p/13204348.html">
+                            1. webpack的入门实践，看这篇就够了(453)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/lookroot/p/12958148.html">
+                            2. vue3.0 beta已出，来快速实践一下吧(382)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/lookroot/p/13204367.html">
+                            3. 2020前端分阶段学习路线方法和资源汇总(227)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/lookroot/p/13645736.html">
+                            4. 浏览器调试的必知必会，零基础足够详细-第一节console面板、移动端调试(193)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/lookroot/p/13184022.html">
+                            5. vue系列教程-07vue动态绑定样式(133)
+                        </a>
+                    </li>
+        </ul>
+    </div>
+</div>
+
+
+</div>
+
+<!-- 评论排行榜 -->
+<div id="sidebar_topcommentedposts" class="sidebar-block">
+    <div class="catListFeedback">
+<h3 class="catListTitle">评论排行榜</h3>
+	<div id="TopFeedbackPostsBlock">
+        <ul style="word-break:break-all">
+                    <li>
+                        <a href="https://www.cnblogs.com/lookroot/p/12958148.html">
+                            1. vue3.0 beta已出，来快速实践一下吧(3)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/lookroot/p/13204348.html">
+                            2. webpack的入门实践，看这篇就够了(1)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/lookroot/p/12958067.html">
+                            3. PHP还是世界上最好的语言吗(1)
+                        </a>
+                    </li>
+        </ul>
+    </div>
+</div>
+
+
+</div>
+
+<!-- 推荐排行榜 -->
+<div id="sidebar_topdiggedposts" class="sidebar-block">
+    
+<div id="topdigg_posts_wrap">
+    <div class="catListView">
+        <h3 class="catListTitle">推荐排行榜</h3>
+        <div id="TopDiggPostsBlock">
+            <ul style="word-break: break-all">
+                        <li>
+                            <a href="https://www.cnblogs.com/lookroot/p/13204348.html">
+                                1. webpack的入门实践，看这篇就够了(1)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/lookroot/p/13645736.html">
+                                2. 浏览器调试的必知必会，零基础足够详细-第一节console面板、移动端调试(1)
+                            </a>
+                        </li>
+            </ul>
+        </div>
+    </div>
+</div>
+</div></div>
+                    <script>loadBlogSideColumn();</script>
+			</div>
+			
+		</div><!--end: sideBarMain -->
+	</div><!--end: sideBar 侧边栏容器 -->
+	<div class="clear"></div>
+	</div><!--end: main -->
+	<div class="clear"></div>
+	<div id="footer">
+		<!--done-->
+Copyright © 2020 lookroot
+<br><span id="poweredby">Powered by .NET Core on Kubernetes</span>
+
+
+
+	</div><!--end: footer -->
+</div><!--end: home 自定义的最大容器 -->
+
+
+    
+
+
+</body></html>
