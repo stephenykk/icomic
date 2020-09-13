@@ -2,6 +2,10 @@
   "name": "icomic",
   "version": "1.0.0",
   "main": "index.js",
+  "scripts": {
+     "down": "node index.js download ",
+     "list": "node index.js list "
+  },
   "dependencies": {
     "axios": "^0.20.0",
     "fs-extra": "^9.0.1",

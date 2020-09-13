@@ -1,7 +1,7 @@
 var fs = require('fs-extra')
 var path = require('path')
 var resolve = dir => path.resolve(__dirname, dir)
-var downName = process.argv[2] || 'hello'
+var downName = process.argv[3] || 'hello'
 
 var myconfig = {}
 if(fs.existsSync(resolve('./myindex.js'))) {
@@ -27,8 +27,12 @@ var config = {
 }
 
 function getConfig(name) {
-    let confMap = {...config, ...myconfig}
-    let conf = confMap[name] || {}
+    let configMap = {...config, ...myconfig}
+    let nameList = Object.keys(configMap)
+    if(!nameList.includes(name)) {
+        throw new Error('name invalid, please check config/index.js')
+    }
+    let conf = configMap[name] || {}
     fs.ensureDirSync(conf.output)
     return conf
 }
