@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
      "down": "node index.js download ",
-     "list": "node index.js list "
+     "list": "node index.js list ",
+     "conf": "node index.js configList "
   },
   "dependencies": {
     "axios": "^0.20.0",

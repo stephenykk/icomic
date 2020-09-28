@@ -9,6 +9,12 @@ class IComic {
   async start() {
     this[action]();
   }
+
+  configList() {
+    var myconfig = require('./config/myindex')
+    helper.log(Object.keys(myconfig))
+  }
+  
   // 获取目标链接列表
   async list() {
     let { top, isReverse, snList } = config.listPage;
@@ -19,6 +25,9 @@ class IComic {
 
     let needLinks = [];
     if (snList && snList.length) {
+      
+      snList = snList.map(v => v*1)
+
       links = links.filter((arr) => {
         let [link, text = ""] = arr;
         let matched = text.match(/\d+/);

@@ -5,7 +5,7 @@ const config = require("../config/index.js");
 
 const puppeteer = require("puppeteer");
 
-axios.defaults.timeout = 30 * 1000;
+axios.defaults.timeout = 40 * 1000;
 axios.defaults.headers["User-Agent"] =
   "Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0";
 
@@ -87,7 +87,29 @@ function output(fname, con, outDir, outputCallback) {
   });
 }
 
+function getCacheList() {
+  var downName = process.argv[3] || 'hello'
+  var fpath = path.resolve(__dirname, '../output', downName, 'list.json')
+  let exists = fs.existsSync(fpath)
+  return exists ? fs.readJsonSync(fpath) : false
+}
+
+function setCacheList(data) {
+  var downName = process.argv[3] || 'hello'
+  var fpath = path.resolve(__dirname, '../output', downName, 'list.json')
+
+  fs.outputJSON(fpath, data)
+}
+
 async function getList() {
+  if(!config.nocache) {
+    let cached = getCacheList()
+    if(cached) {
+      return cached
+    }
+
+  }
+
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
 
@@ -96,9 +118,11 @@ async function getList() {
   });
 
   let { url } = config.listPage;
-  log("goint to page:", url);
+  log("going to page:", url);
 
-  await page.goto(url, { waitUntil: "networkidle0" });
+  // await page.goto(url, { waitUntil: "networkidle0", timeout: 80 * 1000 });
+  await page.goto(url, { waitUntil: "networkidle2", timeout: 80 * 1000 });
+  // await page.goto(url, { waitUntil: "load", timeout: 80 * 1000 });
   const links = await page.evaluate((config) => {
     // console.log('========', JSON.stringify(config))
     var links = document.querySelectorAll(config.listPage.selector);
@@ -111,6 +135,8 @@ async function getList() {
   log2('get links:', links);
   await browser.close();
 
+  setCacheList(links)
+  
   return links;
 }
 
@@ -118,26 +144,41 @@ async function downPage(url) {
   log("downloading page:", url);
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
-  let { reList = [], downContent: isDownContent, callback } = config.detailPage;
+  let { reList = [], downContent: isDownContent, callback , conCheck} = config.detailPage;
 
   if (reList.length) {
     page.on("response", async (response) => {
       let url = response.url();
       let resFile = path.basename(url.split('?')[0])
       if(/\.\w{3,5}$/.test(resFile)) {
-        log('on response file:', resFile)
+        // log('on response file:', resFile)
       }
 
       let normalUrl = url.split('?')[0]
       let wanted = reList.some((re) => re.test(normalUrl));
       if (wanted) {
+        
+        
         let title = await page.title()
         let sn = title.match(/\d+/g)[0] || ''
         response.sn = sn
         let outDir = path.resolve(config.output, sn)
-
-        log2("outputing url:", url);
+        
         let buf = await response.buffer();
+        log('on reponse file, match reList:', resFile)
+        // log(resFile, 'CONTENT:', buf.toString('utf8'))
+        
+        if(conCheck) {
+          let conOK = conCheck(buf.toString('utf8'))
+          if(!conOK) {
+            buf = 'URL IS:' + '\n' + url + '\n' + buf.toString()
+          }
+        }
+        
+        // if(!wanted) return
+        
+        log2("outputing url:", url);
+
         await output(url, buf, outDir);
 
         if (callback && typeof callback === "function") {
