@@ -7,7 +7,7 @@ let action = process.argv[2] || "download";
 
 class IComic {
   async start() {
-    this[action]();
+    this[action](true);
   }
 
   configList() {
@@ -16,9 +16,9 @@ class IComic {
   }
   
   // 获取目标链接列表
-  async list() {
+  async list(skipCache) {
     let { top, isReverse, snList } = config.listPage;
-    let links = await helper.getList();
+    let links = await helper.getList(skipCache);
     if (isReverse) {
       links.reverse();
     }
@@ -45,6 +45,7 @@ class IComic {
 
     return needLinks;
   }
+  
   // 下载目标链接页面 和 想要的网络请求资源
   async download() {
     let downUrls = [];
@@ -52,7 +53,7 @@ class IComic {
     if (url) {
       downUrls = [url];
     } else {
-      downUrls = await this.list();
+      downUrls = await this.list(false);
     }
 
     helper.log2('downUrls:', downUrls)
