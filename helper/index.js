@@ -115,7 +115,7 @@ async function getList(skipCache) {
 
   }
 
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.launch({ headless: true, args: ['--lang=zh-CN'] });
   // const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
 
@@ -144,6 +144,7 @@ async function getList(skipCache) {
     let selector = config.listPage.selector;
     if (Array.isArray(config.listPage.selector)) {
       let [rootSelector, linkSelector] = config.listPage.selector;
+
       root = document.querySelector(rootSelector);
       if(!root) {
         console.warn('\n[ERR]:', `找不到元素 ${rootSelector} \n`);
@@ -152,7 +153,7 @@ async function getList(skipCache) {
       selector = linkSelector;
     }
 
-    var links = document.querySelectorAll(selector);
+    var links = root.querySelectorAll(selector);
     links = Array.from(links);
     links = links.map((link) => [link.href, link.textContent]);
     return links;
