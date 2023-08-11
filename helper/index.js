@@ -129,8 +129,8 @@ async function getList(skipCache) {
     console.log("PAGE CONSOLE:", msg.text());
   });
 
-  let { url , top} = config.listPage;
-  log("going to page:", `'${url}'`);
+  let { url , top } = config.listPage;
+  log("GOING TO LIST PAGE:", `'${url}'`);
 
   // await page.goto(url, { waitUntil: "networkidle0", timeout: 80 * 1000 });
   // await page.goto(url, { waitUntil: "networkidle2", timeout: 80 * 1000 });
@@ -141,9 +141,13 @@ async function getList(skipCache) {
   }catch(e) {
     log('OPEN PAGE ERR :(  ', e)
   }
-  log('open page done:', url)
-  await sleep(5)
+  log('OPEN PAGE DONE:', url)
 
+  // await client render finish
+  await sleep(5)
+  
+  // evaluate callback
+  // 页面打开后，执行自定义回调，并传入config对象
   const links = await page.evaluate((config) => {
     // console.log('========', JSON.stringify(config))
     let root = document;
@@ -184,9 +188,10 @@ async function getList(skipCache) {
 
 function printLatestDown() {
   let files = fs.readdirSync(config.output);
+  // skip dot files
   var names = files.filter(fname => !/^\./.test(fname)).map(val => val * 1)
   names.sort((a, b) => b - a);
-  log2(`${config.output} latest down: `, names.slice(0, 2));
+  log2(`${config.output} latest down: `, names.slice(0, 3));
 }
 
 var closeBrowserTimer;
@@ -197,39 +202,45 @@ async function downPage(url) {
   const browser = await puppeteer.launch({
     // product: 'firefox',
 
-    executablePath: '/usr/lib/chromium-browser/chromium-browser', 
-    headless: true,
+    // executablePath: '/usr/lib/chromium-browser/chromium-browser', 
+    // headless: true,
+    headless: "new",
     devtools: true, 
   });
   const page = await browser.newPage();
-  let { reList = [], downContent: isDownContent, callback , conCheck} = config.detailPage;
+  let { reList = [], downContent: isDownContent, callback , conCheck } = config.detailPage;
 
   if (reList.length) {
+    // listen response , capture wanted
     page.on("response", async (response) => {
-      let url = response.url();
-      let resFile = path.basename(url.split('?')[0])
+      let resUrl = response.url();
+      let normalResUrl = resUrl.split('?')[0]
+      let resFile = path.basename(normalResUrl)
+      // log static file response
       if(/\.\w{3,5}$/.test(resFile)) {
         log('on response file:', resFile)
       }
 
-      let normalUrl = url.split('?')[0]
-      let wanted = reList.some((re) => re.test(normalUrl));
+      let wanted = reList.some((re) => re.test(normalResUrl));
       if (wanted) {
-        log2('got wanted,', normalUrl)
+        log2('got wanted,', normalResUrl)
+        
+        // parse sn from title
         
         let title = await page.title()
-        let sn = title.match(/\d+/g)[0] || ''
+        let sn =  title.match(/\d+/g) ? title.match(/\d+/g)[0] : ''
         response.sn = sn
         let outDir = path.resolve(config.output, sn)
         
+        log('on reponse file, getting buffer:', resFile)
         let buf = await response.buffer();
-        log('on reponse file, match reList:', resFile)
         // log(resFile, 'CONTENT:', buf.toString('utf8'))
         
         if(conCheck) {
+          // check content, ensure it is wanted response
           let conOK = conCheck(buf.toString('utf8'))
           if(!conOK) {
-            buf = 'URL IS:' + '\n' + url + '\n' + buf.toString()
+            buf = 'URL IS:' + '\n' + resUrl + '\n' + buf.toString()
             wanted = false;
             log2('m3u8 content not ok...')
           }
@@ -237,29 +248,33 @@ async function downPage(url) {
         
         if(!wanted) return
         
-        log2("outputing url:", url);
+        log2("outputing url:", resUrl);
 
-        await output(url, buf, outDir);
+        await output(resUrl, buf, outDir);
 
         if (callback && typeof callback === "function") {
           await callback(response, page, browser, helper);
         }
 
-        setTimeout(async() => {
-          await browser.close();
-        }, 2000);
+        // clearTimeout(closeBrowserTimer);
+        // closeBrowserTimer = setTimeout(async() => {
+        //   log2('before close browser!')
+        //   await browser.close();
+        // }, 5000);
       }
     });
   }
 
   // await page.goto(url, { waitUntil: "networkidle2" });
-  // await page.goto(url, { waitUntil: "networkidle0" });
-  await page.goto(url, {referer: config.listPage.url, waitUntil: 'networkidle0' , timeout: 100 * 1000}).catch(err => {
-    log2('goto ', url, err.message)
+  // await page.goto(url, { waitUntil: "load" });
+  // await page.goto(url, {referer: config.listPage.url, waitUntil: 'networkidle0' , timeout: 10 * 1000}).catch(err => {
+  // await page.goto(url, {referer: config.listPage.url, waitUntil: 'domcontentloaded' , timeout: 10 * 1000}).catch(err => {
+  await page.goto(url, {referer: config.listPage.url, waitUntil: 'load' , timeout: 200 * 1000}).catch(err => {
+    log2('goto timeout error:', url, err.message)
   });
   
-  await sleep(5);
-  log("goto done!!");
+  await sleep(2);
+  log2("goto done!!");
 
   isDownContent = isDownContent == null ? true : isDownContent;
 
@@ -274,9 +289,9 @@ async function downPage(url) {
   }
 
   closeBrowserTimer = setTimeout(async() => {
-    // await browser.close();
-
-  }, 6000);
+    log2('at last before close browser...');
+    await browser.close();
+  }, 5000);
 
 }
 

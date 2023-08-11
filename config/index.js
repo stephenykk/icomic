@@ -21,7 +21,8 @@ var config = {
         detailPage: {
             url: 'https://www.cnblogs.com/lookroot/p/13645736.html',
             downContent: true, // 下载页面内容
-            reList: [/news\.aspx/, /wechat\.png/], // 匹配 response.url() 导出资源
+            reList: [/BlogPostInfo\.aspx/, /wechat\.png/], // 匹配 response.url() 导出资源
+            wantedCount: 1,
             callback: false
         }
     }

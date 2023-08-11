@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-     "down": "node index.js download ",
-     "list": "node index.js list ",
-     "conf": "node index.js configList "
+    "down": "node index.js download ",
+    "list": "node index.js list ",
+    "conf": "node index.js configList ",
+    "example": "node index.js download hello "
   },
   "dependencies": {
     "axios": "^0.20.0",
     "fs-extra": "^9.0.1",
-    "puppeteer": "^5.2.1"
+    "puppeteer": "^21.0.3"
   }
 }
