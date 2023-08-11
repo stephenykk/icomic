@@ -152,7 +152,7 @@ const server = http.createServer(async (req, res) => {
     res.end("axios error");
     return;
   }
-
+  // preview comic with no ads
   const { pic, pic2, nextChapter } = getPicUrl(comicRes.data);
   const html = getHtml(pic, pic2, nextChapter);
   res.end(html);

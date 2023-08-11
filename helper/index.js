@@ -25,6 +25,7 @@ function log2(...args) {
   console.log("\n", ...args, "\n");
 }
 
+// download comic pic
 async function download(url, outDir = '', responseType = "stream", outputCallback) {
   log("downloading :", url);
   let fname = path.basename(url);
@@ -87,16 +88,21 @@ function output(fname, con, outDir, outputCallback) {
   });
 }
 
-function getCacheList() {
+function listJsonFilePath() {
   var downName = process.argv[3] || 'hello'
   var fpath = path.resolve(__dirname, '../output', downName, 'list.json')
+
+  return fpath
+}
+
+function getCacheList() {
+  var fpath = listJsonFilePath()
   let exists = fs.existsSync(fpath)
   return exists ? fs.readJsonSync(fpath) : false
 }
 
 function setCacheList(data) {
-  var downName = process.argv[3] || 'hello'
-  var fpath = path.resolve(__dirname, '../output', downName, 'list.json')
+  var fpath = listJsonFilePath()
 
   fs.outputJSON(fpath, data)
 }

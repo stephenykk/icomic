@@ -1,6 +1,5 @@
 const config = require("./config/index.js");
 const helper = require("./helper/index.js");
-const { match } = require("../cdown/url.js");
 
 // node index.js <action: list | download>
 let action = process.argv[2] || "download";
@@ -24,10 +23,11 @@ class IComic {
     }
 
     let needLinks = [];
+    // need download sn list
     if (snList && snList.length) {
       
       snList = snList.map(v => v*1)
-
+      // link.text parse sn, sn in wanted list , and then put into needLinks
       links = links.filter((arr) => {
         let [link, text = ""] = arr;
         let matched = text.match(/\d+/);
@@ -39,6 +39,7 @@ class IComic {
 
       needLinks = links.map((arr) => arr[0]);
     } else {
+      // if not specify snList, then use top n
       links = links.map((arr) => arr[0]);
       needLinks = links.slice(0, top);
     }
@@ -50,6 +51,7 @@ class IComic {
   async download() {
     let downUrls = [];
     let { url } = config.detailPage;
+    // if set detailPage.url download one, else download more
     if (url) {
       downUrls = [url];
     } else {
