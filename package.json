@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "down": "node index.js download ",
-    "list": "node index.js list ",
+    "down": "node index.js download",
+    "list": "node index.js list",
     "conf": "node index.js configList ",
-    "example": "node index.js download hello "
+    "example": "node index.js download hello ",
+    "testServer": "http-server -p 8899",
+    "someTest": "node test.js"
   },
   "dependencies": {
     "axios": "^0.20.0",

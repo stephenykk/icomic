@@ -9,6 +9,11 @@ if(fs.existsSync(resolve('./myindex.js'))) {
     myconfig = require('./myindex.js')
 }
 
+var yoconfig = {}
+if(fs.existsSync(resolve('./yoindex.js'))) {
+    yoconfig = require('./yoindex.js')
+}
+
 var config = {
     hello: {
         output: resolve('../output/hello'),
@@ -29,7 +34,7 @@ var config = {
 }
 
 function getConfig(name) {
-    let realConfig = {...config, ...myconfig}
+    let realConfig = {...config, ...myconfig, ...yoconfig}
     let nameList = Object.keys(realConfig)
     if(!nameList.includes(name)) {
         throw new Error('name invalid, please check config/index.js')

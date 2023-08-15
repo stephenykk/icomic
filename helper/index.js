@@ -195,10 +195,33 @@ function printLatestDown() {
 }
 
 var closeBrowserTimer;
-async function downPage(url) {
+async function downPage(url, urlInfo = {}) {
   // if(closeBrowserTimer) clearTimeout(closeBrowserTimer)
 
-  log2("downloading page:", url);
+  log2("downloading page:", url, urlInfo);
+  const totalOfChapter = urlInfo.total || 1
+  let { reList = [], downContent: isDownContent, callback , conCheck, expectCount = 1 } = config.detailPage;
+  let outputCount = 0
+  if (totalOfChapter) {
+    expectCount = totalOfChapter
+  }
+
+
+  const outputListeners = []
+  const listenOuputOne = (cb) => {
+    if (!outputListeners.includes(cb)) outputListeners.push(cb)
+  }
+  const outputOneCallback = () => {
+    outputListeners.forEach(cb => cb())
+    if (outputCount >= expectCount) {
+      helper.log2('before close browser!')
+      setTimeout(async () => {
+        await browser.close();
+
+      }, 2000)
+    }
+  }
+
   const browser = await puppeteer.launch({
     // product: 'firefox',
 
@@ -208,18 +231,21 @@ async function downPage(url) {
     devtools: true, 
   });
   const page = await browser.newPage();
-  let { reList = [], downContent: isDownContent, callback , conCheck } = config.detailPage;
 
   if (reList.length) {
     // listen response , capture wanted
     page.on("response", async (response) => {
+      
+      if (outputCount >= expectCount) return
+
       let resUrl = response.url();
       let normalResUrl = resUrl.split('?')[0]
       let resFile = path.basename(normalResUrl)
       // log static file response
-      if(/\.\w{3,5}$/.test(resFile)) {
-        log('on response file:', resFile)
-      }
+      // if(/\.\w{3,5}$/.test(resFile)) {
+      //   log('on response file:', resFile)
+      // }
+      log('on response file:', resFile)
 
       let wanted = reList.some((re) => re.test(normalResUrl));
       if (wanted) {
@@ -248,13 +274,16 @@ async function downPage(url) {
         
         if(!wanted) return
         
-        log2("outputing url:", resUrl);
+        outputCount += 1
+        log2(`outputing url ${outputCount}/${expectCount}:`, resUrl);
 
         await output(resUrl, buf, outDir);
 
         if (callback && typeof callback === "function") {
           await callback(response, page, browser, helper);
         }
+
+        outputOneCallback()
 
         // clearTimeout(closeBrowserTimer);
         // closeBrowserTimer = setTimeout(async() => {
@@ -288,10 +317,29 @@ async function downPage(url) {
     }
   }
 
-  closeBrowserTimer = setTimeout(async() => {
-    log2('at last before close browser...');
-    await browser.close();
-  }, 5000);
+  console.log('--------------------kkkk')
+  await page.evaluate(config => {
+    let root = document
+    let selector = config.detailPage.selector
+    if (!selector) return
+
+
+    root = selector.root && document.querySelector(selector.root) || root
+    const nextBtn = root.querySelector(selector.nextBtn)
+
+    const goNext = () => {
+      nextBtn.click()
+    }
+
+    goNext()
+
+    config.listenOuputOne(goNext)
+  }, Object.assign({}, config, { listenOuputOne }))
+
+  // closeBrowserTimer = setTimeout(async() => {
+  //   log2('at last before close browser...');
+  //   await browser.close();
+  // }, 5000);
 
 }
 
