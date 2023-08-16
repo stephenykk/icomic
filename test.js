@@ -1,5 +1,6 @@
 const axios = require("axios");
 const puppeteer = require("puppeteer");
+const crypto = require('crypto')
 
 const testUrl = "http://localhost:8899";
 function log(...args) {
@@ -114,6 +115,43 @@ async function testQuerySelector() {
     await browser.close()
 } 
 
+function md5(text) {
+  return crypto.createHash('md5').update(text).digest('hex')
+}
+
+async function testExposeFunction() {
+  const browser = await puppeteer.launch({headless: 'new'})
+  const page = await browser.newPage()
+  page.on('console', msg => log(msg.text()))
+  await page.exposeFunction('md5', md5)
+  await page.goto(testUrl, { waitUntil: 'load'})
+  const hash = await page.evaluate(() => {
+    const con = document.querySelector('h1').textContent
+    const hash = window.md5(con)
+    return hash
+  })
+
+  log('exposeFunction call result:', hash)
+
+  await browser.close()
+}
+
+async function testWaitForResponse() {
+  const browser = await puppeteer.launch({headless: 'new'})
+  const page = await browser.newPage()
+  page.on('console', msg => log(msg.text()))
+  page.on('response', res => {
+    log('got response:', res.url())
+  })
+
+  // await page.goto(testUrl, {waitUntil: 'load'})
+  await page.goto(testUrl, {waitUntil: 'networkidle0'})
+  log('goto page done')  
+  log(Object.keys(page), Object.keys(page.constructor.prototype))
+  await page.waitFor(3000)
+  await browser.close()
+}
+
 function main() {
   // testAxios()
   // testScreenshot()
@@ -121,7 +159,9 @@ function main() {
   // testRunScriptInPage()
   // testListenConsole()
   // testErrorHandle()
-  testQuerySelector()
+  // testQuerySelector()
+  // testExposeFunction()
+  testWaitForResponse()
 }
 
 main();
