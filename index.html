@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+</head>
+<body>
+    <h1>hello home</h1>
+    <button class="btn">get world.json</button>
+    <em>http-server -p 8899</em>
+    <button class="hi-btn" onclick="alert('hihi')">hello btn</button>
+    <script>
+        console.log('hello page say hi!')
+        // console.log('are you here?', lufy); // trigger some error
+
+        function getHelloJson() {
+            console.log('before get hello.json called')
+            fetch('./hello.json')
+        }
+
+        getHelloJson()
+
+        // setTimeout(() => {
+        //     document.querySelector('.btn').click()
+        // }, 1000);
+        
+        document.querySelector('.btn').onclick = function() {
+            fetch('./world.json')
+        }
+
+        function renderBtn() {
+            const btn = document.createElement('button')
+            btn.className = 'submit-btn'
+            document.body.append(btn)
+            btn.addEventListener('click', () => {
+                console.log('click submit button')
+            })
+        }
+
+        setTimeout(renderBtn, 3000)
+    </script>
+</body>
+</html>
