@@ -307,7 +307,7 @@ async function downPage(url, urlInfo = {}) {
         outputCount += 1
         log2(`outputing url ${outputCount}/${expectCount}:`, resUrl);
 
-        // await output(resUrl, buf, outDir);
+        await output(resUrl, buf, outDir);
 
         if (callback && typeof callback === "function") {
           await callback(response, page, browser, helper);
