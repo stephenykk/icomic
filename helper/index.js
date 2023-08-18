@@ -232,8 +232,8 @@ async function downPage(url, urlInfo = {}) {
 
     // executablePath: '/usr/lib/chromium-browser/chromium-browser', 
     // headless: true,
-    // headless: "new",
-    headless: false,
+    headless: "new",
+    // headless: false,
     devtools: true, 
   });
   const page = await browser.newPage();
@@ -299,7 +299,7 @@ async function downPage(url, urlInfo = {}) {
         doneSet.add(normalResUrl)
         outputCount += 1
         log2(`outputing url ${outputCount}/${expectCount}:`, resUrl);
-        // for test
+
         // await output(resUrl, buf, outDir);
 
         if (callback && typeof callback === "function") {

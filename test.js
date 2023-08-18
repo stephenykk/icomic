@@ -182,6 +182,8 @@ async function testPageClick() {
   // const browser = await puppeteer.launch({headless: 'new'})
   const browser = await puppeteer.launch({headless: false, devtools: true })
   const page = await browser.newPage()
+  // 设置viewport ， 默认 800 *600 会被且切换到移动端页面， 移动端页面有下载app的广告弹层 导致模拟真实点击失败
+  // await page.setViewport({width: 1440, height: 1000, deviceScaleFactor: 1}) 
   // await page.goto(testUrl, {waitUntil: 'load'})
 
   await page.goto('https://tel.dm5.com/m1436110/', {waitUntil: 'load'})
@@ -192,6 +194,8 @@ async function testPageClick() {
   console.log(await btnHandle.jsonValue(), '<-------')
   await new Promise(resolve => setTimeout(resolve, 10000, 1));
   console.log('before click btn')
+  // 先关闭弹层
+  await page.click('.lb-win-con a')
   await page.click('.userbtn')
   // await btnHandle.click()
 
