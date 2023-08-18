@@ -198,6 +198,9 @@ var closeBrowserTimer;
 async function downPage(url, urlInfo = {}) {
   // if(closeBrowserTimer) clearTimeout(closeBrowserTimer)
 
+  let resolve = null
+  const downPromise = new Promise(res => resolve = res)
+
   log2("downloading page:", url, urlInfo);
   const totalOfChapter = urlInfo.total || 1
   let { reList = [], downContent: isDownContent, callback , conCheck, expectCount = 1 } = config.detailPage;
@@ -211,14 +214,16 @@ async function downPage(url, urlInfo = {}) {
   const listenOutputOne = (cb) => {
     if (!outputListeners.includes(cb)) outputListeners.push(cb)
   }
-  const outputOneCallback = () => {
-    outputListeners.forEach(cb => cb())
+  const outputOneCallback = async () => {
+    for (const cb of outputListeners) {
+      await cb()
+    }
+    // outputListeners.forEach(cb => cb())
     if (outputCount >= expectCount) {
       helper.log2('before close browser!')
-      setTimeout(async () => {
-        await browser.close();
-
-      }, 2000)
+      await sleep(2)
+      await browser.close()
+      resolve(true)
     }
   }
 
@@ -227,7 +232,8 @@ async function downPage(url, urlInfo = {}) {
 
     // executablePath: '/usr/lib/chromium-browser/chromium-browser', 
     // headless: true,
-    headless: "new",
+    // headless: "new",
+    headless: false,
     devtools: true, 
   });
   const page = await browser.newPage();
@@ -236,6 +242,9 @@ async function downPage(url, urlInfo = {}) {
     const { root = '', nextBtn = ''} = config.detailPage.selector
     const selector = (root + ' ' + nextBtn).trim()
     if (!selector) return
+    await page.waitForSelector(selector)
+    log2('next button selector ready:', selector)
+    await page.click('.avatar.userbtn')
     await page.click(selector)
   }
 
@@ -290,8 +299,8 @@ async function downPage(url, urlInfo = {}) {
         doneSet.add(normalResUrl)
         outputCount += 1
         log2(`outputing url ${outputCount}/${expectCount}:`, resUrl);
-
-        await output(resUrl, buf, outDir);
+        // for test
+        // await output(resUrl, buf, outDir);
 
         if (callback && typeof callback === "function") {
           await callback(response, page, browser, helper);
@@ -318,6 +327,9 @@ async function downPage(url, urlInfo = {}) {
   
   // await sleep(2);
   log2("goto done!!");
+
+  await page.waitForSelector('.avatar.userbtn')
+  await page.click('.avatar.userbtn')
 
   isDownContent = isDownContent == null ? true : isDownContent;
 
@@ -350,10 +362,11 @@ async function downPage(url, urlInfo = {}) {
   }, config)
 
   // closeBrowserTimer = setTimeout(async() => {
-  //   log2('at last before close browser...');
-  //   await browser.close();
-  // }, 5000);
-
+    //   log2('at last before close browser...');
+    //   await browser.close();
+    // }, 5000);
+    
+  return downPromise
 }
 
 function sleep(seconds = 1) {

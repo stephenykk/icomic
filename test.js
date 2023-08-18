@@ -177,6 +177,26 @@ async function testWaitForSelector() {
   await browser.close()
 }
 
+
+async function testPageClick() {
+  // const browser = await puppeteer.launch({headless: 'new'})
+  const browser = await puppeteer.launch({headless: false, devtools: true })
+  const page = await browser.newPage()
+  // await page.goto(testUrl, {waitUntil: 'load'})
+
+  await page.goto('https://tel.dm5.com/m1436110/', {waitUntil: 'load'})
+  const pages = await browser.pages()
+  const lastPage = pages[pages.length - 1]
+  log(pages, '<---pages')
+  const btnHandle = await lastPage.$('.userbtn')
+  console.log(await btnHandle.jsonValue(), '<-------')
+  await new Promise(resolve => setTimeout(resolve, 10000, 1));
+  console.log('before click btn')
+  await page.click('.userbtn')
+  // await btnHandle.click()
+
+}
+
 function main() {
   // testAxios()
   // testScreenshot()
@@ -187,7 +207,8 @@ function main() {
   // testQuerySelector()
   // testExposeFunction()
   // testWaitForResponse()
-  testWaitForSelector()
+  // testWaitForSelector()
+  testPageClick()
 }
 
 main();
