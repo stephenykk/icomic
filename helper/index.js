@@ -2,6 +2,7 @@ const fs = require("fs-extra");
 const path = require("path");
 const axios = require("axios");
 const config = require("../config/index.js");
+const { runCommand, spawnCommand } = require('./runCommand.js')
 
 const puppeteer = require("puppeteer");
 
@@ -218,6 +219,7 @@ async function downPage(url, urlInfo = {}) {
     callback,
     conCheck,
     expectCount = 1,
+    isMp4
   } = config.detailPage;
   let outputCount = 0;
   if (totalOfChapter) {
@@ -233,7 +235,8 @@ async function downPage(url, urlInfo = {}) {
     if (outputCount >= expectCount) {
       helper.log2("before close browser!");
       await sleep(2);
-      await browser.close();
+      // await browser.close();
+      await closeBrowser()
       resolve(true);
     } else {
       for (const cb of outputListeners) {
@@ -241,6 +244,16 @@ async function downPage(url, urlInfo = {}) {
       }
     }
   };
+
+  const closeBrowser = async () => {
+    await sleep(2)
+    if (gotoDone) {
+      return await browser.close()
+    } else {
+      return await closeBrowser()
+    }
+
+  }
 
   const browser = await puppeteer.launch({
     // product: 'firefox',
@@ -251,10 +264,12 @@ async function downPage(url, urlInfo = {}) {
     // headless: false,
     devtools: true,
   });
+
+  let gotoDone = false
   const page = await browser.newPage();
 
+  const { root = "", nextBtn = "" } = config.detailPage.selector || {};
   const clickNextBtn = async function () {
-    const { root = "", nextBtn = "" } = config.detailPage.selector;
     const selector = (root + " " + nextBtn).trim();
     if (!selector) return;
     await page.waitForSelector(selector);
@@ -270,7 +285,7 @@ async function downPage(url, urlInfo = {}) {
     }, selector);
   };
 
-  listenOutputOne(clickNextBtn);
+  nextBtn && listenOutputOne(clickNextBtn);
 
   page.on("console", (msg) => log("console:", msg.text()));
   page.on("pageerror", (error) => log2("error:", error));
@@ -292,8 +307,30 @@ async function downPage(url, urlInfo = {}) {
       // log('on response file:', resFile)
       // log("on response url:", normalResUrl);
 
-      let wanted = reList.some((re) => re.test(normalResUrl));
+      let wanted = false
+      
+      if (isMp4) {
+        wanted = reList.some((re) => re.test(resUrl));
+        
+      } else {
+        wanted = reList.some((re) => re.test(normalResUrl));
+        
+      }
+
       if (wanted) {
+
+        if (isMp4) {
+          const status = response.status()
+          const headers = response.headers()
+          log2('content-type status:', headers['content-type'], status)
+          if (status !== 206 || !/mp4/.test(headers['content-type'])) {
+            wanted = false    
+          }
+
+          if (!wanted) return
+
+        }
+
         log2("got wanted,", normalResUrl);
 
         // parse sn from title
@@ -306,7 +343,7 @@ async function downPage(url, urlInfo = {}) {
         let outDir = path.resolve(config.output, sn);
 
         log("on reponse file, getting buffer:", resFile);
-        let buf = await response.buffer();
+        let buf = isMp4 ? false : await response.buffer();
         // log(resFile, 'CONTENT:', buf.toString('utf8'))
 
         if (conCheck) {
@@ -325,7 +362,16 @@ async function downPage(url, urlInfo = {}) {
         outputCount += 1;
         log2(`outputing url ${outputCount}/${expectCount}:`, resUrl);
 
-        await output(resUrl, buf, outDir);
+        if (isMp4) {
+          fs.ensureDirSync(outDir)
+          const outFile = `${outDir}${path.sep}index.mp4`
+          await spawnCommand('curl', ['-o', outFile, resUrl])
+          // await spawnCommand('curl', [`-o ${sn}.mp4`, `${resUrl}`])
+          // await runCommand(`curl -o ${outDir}${path.sep}index.mp4 "${resUrl}"`)
+
+        } else {
+          await output(resUrl, buf, outDir);
+        }
 
         if (callback && typeof callback === "function") {
           await callback(response, page, browser, helper);
@@ -355,7 +401,8 @@ async function downPage(url, urlInfo = {}) {
     .catch((err) => {
       log2("goto timeout error:", url, err.message);
     });
-
+  
+  gotoDone = true
   // await sleep(2);
   log2("goto done!!");
 
