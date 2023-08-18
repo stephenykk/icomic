@@ -244,8 +244,15 @@ async function downPage(url, urlInfo = {}) {
     if (!selector) return
     await page.waitForSelector(selector)
     log2('next button selector ready:', selector)
-    await page.click('.avatar.userbtn')
-    await page.click(selector)
+    // 这是在模拟真实的鼠标点击，有遮罩挡着会点击不到目标元素
+    // await page.click('.avatar.userbtn')
+    // await page.click(selector)
+    // 用js的点击，可以无视遮罩覆盖的问题
+    await page.evaluate((selector) => {
+      const nbtn = document.querySelector(selector)
+      nbtn && nbtn.click()
+      return true
+    }, selector)
   }
 
   listenOutputOne(clickNextBtn)
