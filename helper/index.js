@@ -26,7 +26,12 @@ function log2(...args) {
 }
 
 // download comic pic
-async function download(url, outDir = '', responseType = "stream", outputCallback) {
+async function download(
+  url,
+  outDir = "",
+  responseType = "stream",
+  outputCallback
+) {
   log("downloading :", url);
   let fname = path.basename(url);
   // res is object, res.data is stream
@@ -44,13 +49,13 @@ async function download(url, outDir = '', responseType = "stream", outputCallbac
   return outResult;
 }
 
-function output(fname, con, outDir, outputCallback) {  
+function output(fname, con, outDir, outputCallback) {
   if (isUrl(fname)) {
     fname = path.basename(fname);
     fname = fname.replace(/\?.*$/, "");
   }
-  outDir = outDir || config.output
-  fs.ensureDirSync(outDir)
+  outDir = outDir || config.output;
+  fs.ensureDirSync(outDir);
 
   let outFile = path.resolve(outDir, fname);
   // if exists , rename new file
@@ -65,8 +70,8 @@ function output(fname, con, outDir, outputCallback) {
       rs.pipe(ws);
       ws.on("finish", () => {
         log("output ok:", fname);
-        if(typeof outputCallback === 'function') {
-          outputCallback(outFile)
+        if (typeof outputCallback === "function") {
+          outputCallback(outFile);
         }
         resolve(true);
       });
@@ -77,9 +82,9 @@ function output(fname, con, outDir, outputCallback) {
         resolve(false);
       } else {
         log("output file:", fname);
-        
-        if(typeof outputCallback=== 'function') {
-          outputCallback(outFile)
+
+        if (typeof outputCallback === "function") {
+          outputCallback(outFile);
         }
 
         resolve(true);
@@ -89,39 +94,41 @@ function output(fname, con, outDir, outputCallback) {
 }
 
 function listJsonFilePath() {
-  var downName = process.argv[3] || 'hello'
-  var fpath = path.resolve(__dirname, '../output', downName, 'list.json')
+  var downName = process.argv[3] || "hello";
+  var fpath = path.resolve(__dirname, "../output", downName, "list.json");
 
-  return fpath
+  return fpath;
 }
 
 function getCacheList() {
-  var fpath = listJsonFilePath()
-  let exists = fs.existsSync(fpath)
-  return exists ? fs.readJsonSync(fpath) : false
+  var fpath = listJsonFilePath();
+  let exists = fs.existsSync(fpath);
+  return exists ? fs.readJsonSync(fpath) : false;
 }
 
 function setCacheList(data) {
-  var fpath = listJsonFilePath()
+  var fpath = listJsonFilePath();
 
-  fs.outputJSON(fpath, data)
+  fs.outputJSON(fpath, data);
 }
 
 function sleep(seconds) {
-  return new Promise(resolve => setTimeout(resolve, seconds * 1000))
+  return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
 }
 
 async function getList(skipCache) {
-  if(!config.nocache && !skipCache) {
-    let cached = getCacheList()
-    if(cached) {
-      helper.log('GET LIST FROM CACHE', cached)
-      return cached
+  if (!config.nocache && !skipCache) {
+    let cached = getCacheList();
+    if (cached) {
+      helper.log("GET LIST FROM CACHE", cached);
+      return cached;
     }
-
   }
 
-  const browser = await puppeteer.launch({ headless: true, args: ['--lang=zh-CN'] });
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ["--lang=zh-CN"],
+  });
   // const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
 
@@ -129,7 +136,7 @@ async function getList(skipCache) {
     console.log("PAGE CONSOLE:", msg.text());
   });
 
-  let { url , top } = config.listPage;
+  let { url, top } = config.listPage;
   log("GOING TO LIST PAGE:", `'${url}'`);
 
   // await page.goto(url, { waitUntil: "networkidle0", timeout: 80 * 1000 });
@@ -137,15 +144,14 @@ async function getList(skipCache) {
   // await page.goto(url, { waitUntil: "load", timeout: 80 * 1000 });
   try {
     await page.goto(url, { waitUntil: "domcontentloaded", timeout: 20 * 1000 });
-
-  }catch(e) {
-    log('OPEN PAGE ERR :(  ', e)
+  } catch (e) {
+    log("OPEN PAGE ERR :(  ", e);
   }
-  log('OPEN PAGE DONE:', url)
+  log("OPEN PAGE DONE:", url);
 
   // await client render finish
-  await sleep(5)
-  
+  await sleep(5);
+
   // evaluate callback
   // 页面打开后，执行自定义回调，并传入config对象
   const links = await page.evaluate((config) => {
@@ -156,8 +162,8 @@ async function getList(skipCache) {
       let [rootSelector, linkSelector] = config.listPage.selector;
 
       root = document.querySelector(rootSelector);
-      if(!root) {
-        console.warn('\n[ERR]:', `找不到元素 ${rootSelector} \n`);
+      if (!root) {
+        console.warn("\n[ERR]:", `找不到元素 ${rootSelector} \n`);
         root = document;
       }
       selector = linkSelector;
@@ -169,27 +175,30 @@ async function getList(skipCache) {
     return links;
     // return document.title
   }, config);
-  
+
   // make sure desc order
   links.sort((a, b) => {
-    let an = parseInt(a[1].replace(/\D/g, '') || 0)
-    let bn = parseInt(b[1].replace(/\D/g, '') || 0)
-    return bn - an
+    let an = parseInt(a[1].replace(/\D/g, "") || 0);
+    let bn = parseInt(b[1].replace(/\D/g, "") || 0);
+    return bn - an;
   });
 
-  log2(`get links ${top ? 'of top ' + top : ''}:`, top ? links.slice(0, top) : links);
+  log2(
+    `get links ${top ? "of top " + top : ""}:`,
+    top ? links.slice(0, top) : links
+  );
   await browser.close();
 
   printLatestDown();
-  setCacheList(links)
-  
+  setCacheList(links);
+
   return links;
 }
 
 function printLatestDown() {
   let files = fs.readdirSync(config.output);
   // skip dot files
-  var names = files.filter(fname => !/^\./.test(fname)).map(val => val * 1)
+  var names = files.filter((fname) => !/^\./.test(fname)).map((val) => val * 1);
   names.sort((a, b) => b - a);
   log2(`${config.output} latest down: `, names.slice(0, 3));
 }
@@ -198,113 +207,122 @@ var closeBrowserTimer;
 async function downPage(url, urlInfo = {}) {
   // if(closeBrowserTimer) clearTimeout(closeBrowserTimer)
 
-  let resolve = null
-  const downPromise = new Promise(res => resolve = res)
+  let resolve = null;
+  const downPromise = new Promise((res) => (resolve = res));
 
   log2("downloading page:", url, urlInfo);
-  const totalOfChapter = urlInfo.total || 1
-  let { reList = [], downContent: isDownContent, callback , conCheck, expectCount = 1 } = config.detailPage;
-  let outputCount = 0
+  const totalOfChapter = urlInfo.total || 1;
+  let {
+    reList = [],
+    downContent: isDownContent,
+    callback,
+    conCheck,
+    expectCount = 1,
+  } = config.detailPage;
+  let outputCount = 0;
   if (totalOfChapter) {
-    expectCount = totalOfChapter
+    expectCount = totalOfChapter;
   }
 
-
-  const outputListeners = []
+  const outputListeners = [];
   const listenOutputOne = (cb) => {
-    if (!outputListeners.includes(cb)) outputListeners.push(cb)
-  }
+    if (!outputListeners.includes(cb)) outputListeners.push(cb);
+  };
   const outputOneCallback = async () => {
-    for (const cb of outputListeners) {
-      await cb()
-    }
     // outputListeners.forEach(cb => cb())
     if (outputCount >= expectCount) {
-      helper.log2('before close browser!')
-      await sleep(2)
-      await browser.close()
-      resolve(true)
+      helper.log2("before close browser!");
+      await sleep(2);
+      await browser.close();
+      resolve(true);
+    } else {
+      for (const cb of outputListeners) {
+        await cb();
+      }
     }
-  }
+  };
 
   const browser = await puppeteer.launch({
     // product: 'firefox',
 
-    // executablePath: '/usr/lib/chromium-browser/chromium-browser', 
+    // executablePath: '/usr/lib/chromium-browser/chromium-browser',
     // headless: true,
     headless: "new",
     // headless: false,
-    devtools: true, 
+    devtools: true,
   });
   const page = await browser.newPage();
 
-  const clickNextBtn = async function() {
-    const { root = '', nextBtn = ''} = config.detailPage.selector
-    const selector = (root + ' ' + nextBtn).trim()
-    if (!selector) return
-    await page.waitForSelector(selector)
-    log2('next button selector ready:', selector)
+  const clickNextBtn = async function () {
+    const { root = "", nextBtn = "" } = config.detailPage.selector;
+    const selector = (root + " " + nextBtn).trim();
+    if (!selector) return;
+    await page.waitForSelector(selector);
+    log2("next button selector ready:", selector);
     // 这是在模拟真实的鼠标点击，有遮罩挡着会点击不到目标元素
     // await page.click('.avatar.userbtn')
     // await page.click(selector)
     // 用js的点击，可以无视遮罩覆盖的问题
     await page.evaluate((selector) => {
-      const nbtn = document.querySelector(selector)
-      nbtn && nbtn.click()
-      return true
-    }, selector)
-  }
+      const nbtn = document.querySelector(selector);
+      nbtn && nbtn.click();
+      return true;
+    }, selector);
+  };
 
-  listenOutputOne(clickNextBtn)
+  listenOutputOne(clickNextBtn);
 
-  page.on('console', msg => log('console:', msg.text()))
-  page.on('pageerror', error => log2('error:', error))
+  page.on("console", (msg) => log("console:", msg.text()));
+  page.on("pageerror", (error) => log2("error:", error));
 
   if (reList.length) {
     // listen response , capture wanted
-    const doneSet = new Set()
+    const doneSet = new Set();
     page.on("response", async (response) => {
-      if (outputCount >= expectCount) return
+      if (outputCount >= expectCount) return;
 
       let resUrl = response.url();
-      let normalResUrl = resUrl.split('?')[0]
-      let resFile = path.basename(normalResUrl)
+      let normalResUrl = decodeURIComponent(resUrl.split("?")[0]);
+      let resFile = path.basename(normalResUrl);
       // log static file response
       // if(/\.\w{3,5}$/.test(resFile)) {
       //   log('on response file:', resFile)
       // }
-      log('on response file:', resFile)
+
+      // log('on response file:', resFile)
+      // log("on response url:", normalResUrl);
 
       let wanted = reList.some((re) => re.test(normalResUrl));
       if (wanted) {
-        log2('got wanted,', normalResUrl)
-        
+        log2("got wanted,", normalResUrl);
+
         // parse sn from title
-        
-        let title = await page.title()
-        let sn =  urlInfo.sn || (title.match(/\d+/g) ? title.match(/\d+/g)[0] : '') 
-        sn = sn + ''
-        response.sn = sn
-        let outDir = path.resolve(config.output, sn)
-        
-        log('on reponse file, getting buffer:', resFile)
+
+        let title = await page.title();
+        let sn =
+          urlInfo.sn || (title.match(/\d+/g) ? title.match(/\d+/g)[0] : "");
+        sn = sn + "";
+        response.sn = sn;
+        let outDir = path.resolve(config.output, sn);
+
+        log("on reponse file, getting buffer:", resFile);
         let buf = await response.buffer();
         // log(resFile, 'CONTENT:', buf.toString('utf8'))
-        
-        if(conCheck) {
+
+        if (conCheck) {
           // check content, ensure it is wanted response
-          let conOK = conCheck(buf.toString('utf8'))
-          if(!conOK) {
-            buf = 'URL IS:' + '\n' + resUrl + '\n' + buf.toString()
+          let conOK = conCheck(buf.toString("utf8"));
+          if (!conOK) {
+            buf = "URL IS:" + "\n" + resUrl + "\n" + buf.toString();
             wanted = false;
-            log2('m3u8 content not ok...')
+            log2("m3u8 content not ok...");
           }
         }
-        
-        if(!wanted) return
-        if (doneSet.has(normalResUrl)) return
-        doneSet.add(normalResUrl)
-        outputCount += 1
+
+        if (!wanted) return;
+        if (doneSet.has(normalResUrl)) return;
+        doneSet.add(normalResUrl);
+        outputCount += 1;
         log2(`outputing url ${outputCount}/${expectCount}:`, resUrl);
 
         await output(resUrl, buf, outDir);
@@ -313,7 +331,7 @@ async function downPage(url, urlInfo = {}) {
           await callback(response, page, browser, helper);
         }
 
-        outputOneCallback()
+        outputOneCallback();
 
         // clearTimeout(closeBrowserTimer);
         // closeBrowserTimer = setTimeout(async() => {
@@ -328,15 +346,21 @@ async function downPage(url, urlInfo = {}) {
   // await page.goto(url, { waitUntil: "load" });
   // await page.goto(url, {referer: config.listPage.url, waitUntil: 'networkidle0' , timeout: 10 * 1000}).catch(err => {
   // await page.goto(url, {referer: config.listPage.url, waitUntil: 'domcontentloaded' , timeout: 10 * 1000}).catch(err => {
-  await page.goto(url, {referer: config.listPage.url, waitUntil: 'networkidle0' , timeout: 200 * 1000}).catch(err => {
-    log2('goto timeout error:', url, err.message)
-  });
-  
+  await page
+    .goto(url, {
+      referer: config.listPage.url,
+      waitUntil: "networkidle0",
+      timeout: 200 * 1000,
+    })
+    .catch((err) => {
+      log2("goto timeout error:", url, err.message);
+    });
+
   // await sleep(2);
   log2("goto done!!");
 
-  await page.waitForSelector('.avatar.userbtn')
-  await page.click('.avatar.userbtn')
+  // await page.waitForSelector(".avatar.userbtn");
+  // await page.click(".avatar.userbtn");
 
   isDownContent = isDownContent == null ? true : isDownContent;
 
@@ -345,39 +369,37 @@ async function downPage(url, urlInfo = {}) {
     // log('=====', con)
     await output(url, con);
 
-    if(!reList.length) {
+    if (!reList.length) {
       await browser.close();
     }
   }
 
-  await page.evaluate(config => {
-    let root = document
-    let selector = config.detailPage.selector
-    if (!selector) return
+  await page.evaluate((config) => {
+    let root = document;
+    let selector = config.detailPage.selector;
+    if (!selector) return;
 
-
-    root = selector.root && document.querySelector(selector.root) || root
-    const nextBtn = root.querySelector(selector.nextBtn)
+    root = (selector.root && document.querySelector(selector.root)) || root;
+    const nextBtn = root.querySelector(selector.nextBtn);
 
     const goNext = () => {
-      nextBtn.click()
-    }
+      nextBtn.click();
+    };
 
-   // goNext()
-   console.log('detail config:', config)
-
-  }, config)
+    // goNext()
+    console.log("detail config:", config);
+  }, config);
 
   // closeBrowserTimer = setTimeout(async() => {
-    //   log2('at last before close browser...');
-    //   await browser.close();
-    // }, 5000);
-    
-  return downPromise
+  //   log2('at last before close browser...');
+  //   await browser.close();
+  // }, 5000);
+
+  return downPromise;
 }
 
 function sleep(seconds = 1) {
-  return new Promise(resolve => setTimeout(resolve, seconds * 1000));
+  return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
 }
 
 var helper = {
