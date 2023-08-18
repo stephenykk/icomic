@@ -147,8 +147,33 @@ async function testWaitForResponse() {
   // await page.goto(testUrl, {waitUntil: 'load'})
   await page.goto(testUrl, {waitUntil: 'networkidle0'})
   log('goto page done')  
-  log(Object.keys(page), Object.keys(page.constructor.prototype))
-  await page.waitFor(3000)
+  await page.click('.btn')
+  const resp = await page.waitForResponse(res => res.url().includes("/world.json"))
+  log('resp: ', resp.ok())
+  if (resp.ok()) {
+    const data = await resp.json()
+    log('data::', data)
+  }
+
+  // await page.waitForTimeo`ut(3000)
+  // await browser.close()
+}
+
+
+async function testWaitForSelector() {
+  const browser = await puppeteer.launch({headless: 'new'})
+  const page = await browser.newPage()
+  page.on('console', msg => log(msg.text()))
+  page.on('pageerror', error => log('error::', error))
+  page.on('error', error => log('crash:', error))
+  await page.goto(testUrl, {waitUntil: 'load'})
+ // const btn = await page.waitForSelector('.submit-btn')
+ // log('goto done. btn:', btn)
+ // await btn.click()
+  const watchSubmitBtn = page.waitForFunction(() => !!document.querySelector('.submit-btn'))
+  await watchSubmitBtn
+  await page.click('.submit-btn')
+  await new Promise(resolve => setTimeout(resolve, 1000, true))
   await browser.close()
 }
 
@@ -161,7 +186,8 @@ function main() {
   // testErrorHandle()
   // testQuerySelector()
   // testExposeFunction()
-  testWaitForResponse()
+  // testWaitForResponse()
+  testWaitForSelector()
 }
 
 main();

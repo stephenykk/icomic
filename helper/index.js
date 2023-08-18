@@ -208,7 +208,7 @@ async function downPage(url, urlInfo = {}) {
 
 
   const outputListeners = []
-  const listenOuputOne = (cb) => {
+  const listenOutputOne = (cb) => {
     if (!outputListeners.includes(cb)) outputListeners.push(cb)
   }
   const outputOneCallback = () => {
@@ -232,10 +232,22 @@ async function downPage(url, urlInfo = {}) {
   });
   const page = await browser.newPage();
 
+  const clickNextBtn = async function() {
+    const { root = '', nextBtn = ''} = config.detailPage.selector
+    const selector = (root + ' ' + nextBtn).trim()
+    if (!selector) return
+    await page.click(selector)
+  }
+
+  listenOutputOne(clickNextBtn)
+
+  page.on('console', msg => log('console:', msg.text()))
+  page.on('pageerror', error => log2('error:', error))
+
   if (reList.length) {
     // listen response , capture wanted
+    const doneSet = new Set()
     page.on("response", async (response) => {
-      
       if (outputCount >= expectCount) return
 
       let resUrl = response.url();
@@ -254,7 +266,8 @@ async function downPage(url, urlInfo = {}) {
         // parse sn from title
         
         let title = await page.title()
-        let sn =  title.match(/\d+/g) ? title.match(/\d+/g)[0] : ''
+        let sn =  urlInfo.sn || (title.match(/\d+/g) ? title.match(/\d+/g)[0] : '') 
+        sn = sn + ''
         response.sn = sn
         let outDir = path.resolve(config.output, sn)
         
@@ -273,7 +286,8 @@ async function downPage(url, urlInfo = {}) {
         }
         
         if(!wanted) return
-        
+        if (doneSet.has(normalResUrl)) return
+        doneSet.add(normalResUrl)
         outputCount += 1
         log2(`outputing url ${outputCount}/${expectCount}:`, resUrl);
 
@@ -298,11 +312,11 @@ async function downPage(url, urlInfo = {}) {
   // await page.goto(url, { waitUntil: "load" });
   // await page.goto(url, {referer: config.listPage.url, waitUntil: 'networkidle0' , timeout: 10 * 1000}).catch(err => {
   // await page.goto(url, {referer: config.listPage.url, waitUntil: 'domcontentloaded' , timeout: 10 * 1000}).catch(err => {
-  await page.goto(url, {referer: config.listPage.url, waitUntil: 'load' , timeout: 200 * 1000}).catch(err => {
+  await page.goto(url, {referer: config.listPage.url, waitUntil: 'networkidle0' , timeout: 200 * 1000}).catch(err => {
     log2('goto timeout error:', url, err.message)
   });
   
-  await sleep(2);
+  // await sleep(2);
   log2("goto done!!");
 
   isDownContent = isDownContent == null ? true : isDownContent;
@@ -317,7 +331,6 @@ async function downPage(url, urlInfo = {}) {
     }
   }
 
-  console.log('--------------------kkkk')
   await page.evaluate(config => {
     let root = document
     let selector = config.detailPage.selector
@@ -331,10 +344,10 @@ async function downPage(url, urlInfo = {}) {
       nextBtn.click()
     }
 
-    goNext()
+   // goNext()
+   console.log('detail config:', config)
 
-    config.listenOuputOne(goNext)
-  }, Object.assign({}, config, { listenOuputOne }))
+  }, config)
 
   // closeBrowserTimer = setTimeout(async() => {
   //   log2('at last before close browser...');

@@ -7,8 +7,8 @@
     "list": "node index.js list",
     "conf": "node index.js configList ",
     "example": "node index.js download hello ",
-    "testServer": "http-server -p 8899",
-    "someTest": "node test.js"
+    "serve": "http-server -p 8899",
+    "mytest": "node test.js"
   },
   "dependencies": {
     "axios": "^0.20.0",
