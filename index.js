@@ -85,6 +85,7 @@ class IComic {
     helper.log2('downUrls:', downUrls)
 
     for (let url of downUrls) {
+      helper.log(`------------------------------ downloading ${url} ------------------------------`)
       await helper.downPage(url, urlInfos[url]);
     }
   }
