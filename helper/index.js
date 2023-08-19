@@ -82,7 +82,7 @@ function output(fname, con, outDir, outputCallback) {
         log2("output err:", err);
         resolve(false);
       } else {
-        log("output file:", fname);
+        log("output file:", fname, outFile);
 
         if (typeof outputCallback === "function") {
           outputCallback(outFile);
@@ -219,9 +219,12 @@ async function downPage(url, urlInfo = {}) {
     callback,
     conCheck,
     expectCount = 1,
-    isMp4
+    isMp4,
+    checkIsM3u8,
   } = config.detailPage;
   let outputCount = 0;
+  let isM3u8 = false
+
   if (totalOfChapter) {
     expectCount = totalOfChapter;
   }
@@ -317,6 +320,14 @@ async function downPage(url, urlInfo = {}) {
         
       }
 
+      if (typeof checkIsM3u8 === 'function') {
+        const isM3u8Mode = checkIsM3u8(response)
+        if (isM3u8Mode) {
+          isM3u8 = true
+          isMp4 = false
+        }
+      }
+
       if (wanted) {
 
         if (isMp4) {
@@ -374,10 +385,10 @@ async function downPage(url, urlInfo = {}) {
         }
 
         if (callback && typeof callback === "function") {
-          await callback(response, page, browser, helper);
+          await callback(response, page, browser, helper, outDir);
         }
 
-        outputOneCallback();
+        outputOneCallback(isM3u8);
 
         // clearTimeout(closeBrowserTimer);
         // closeBrowserTimer = setTimeout(async() => {
