@@ -2,7 +2,7 @@ var fs = require('fs-extra')
 var path = require('path')
 var resolve = dir => path.resolve(__dirname, dir)
 // node index.js down yaojing
-var downName = process.argv[3] || 'hello'
+var downName = (process.argv[3] || process.argv[2]  || 'hello').split('/').shift()
 
 var myconfig = {}
 if(fs.existsSync(resolve('./myindex.js'))) {

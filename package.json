@@ -5,6 +5,8 @@
   "scripts": {
     "down": "node index.js download",
     "cdown": "cd cdown && npm run down",
+    "coutput": "cd cdown && npm run mp4",
+    "cclear": "cd cdown && npm run clearTs",
     "list": "node index.js list",
     "conf": "node index.js configList ",
     "example": "node index.js download hello ",
@@ -15,6 +17,7 @@
     "agentkeepalive": "^4.5.0",
     "axios": "^0.20.0",
     "fs-extra": "^9.0.1",
+    "got": "11.6.2",
     "puppeteer": "^21.0.3"
   }
 }
