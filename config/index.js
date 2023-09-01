@@ -40,7 +40,8 @@ function getConfig(name) {
         throw new Error('name invalid, please check config/index.js')
     }
     let comicConf = realConfig[name] || {}
-    fs.ensureDirSync(comicConf.output)
+    const srcDir = path.resolve(__dirname, '..')
+    fs.ensureDirSync(path.resolve(srcDir, comicConf.output))
     return comicConf
 }
 

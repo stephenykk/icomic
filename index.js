@@ -1,9 +1,17 @@
+const fs = require('fs')
+const path = require('path')
 const config = require("./config/index.js");
 const helper = require("./helper/index.js");
 
 // node index.js <action: list | download>
 let action = process.argv[2] || "download";
 const skipCache = process.argv[4] ? JSON.parse(process.argv[4]) : false
+const dirName = process.argv[3]
+if(dirName.includes('/')) {
+  helper.log2('PLEASE INPUT COMIC NAME, NOT PATH')
+  process.exit(1)
+}
+
 
 class IComic {
   async start() {
@@ -67,6 +75,26 @@ class IComic {
 
     return {needLinks, linkInfos};
   }
+
+  // 检查是否有更新的资源
+  async checkNewer(skipCache) {
+    const {needLinks, linkInfos} = await this.list(true)
+    const newestLinkInfo = Object.values(linkInfos).sort((infoA, infoB) => infoA.sn * 1 - infoB.sn * 1).pop()
+    helper.log2('newestLinkInfo:', newestLinkInfo)
+    const outDir = path.resolve(__dirname, config.output)
+    const folderNames = fs.readdirSync(outDir).filter(fname => !/^\./.test(fname)).filter(fname => fs.statSync(path.resolve(outDir, fname)).isDirectory())
+
+    const maxDoneSn = !folderNames.length ? 0 : Math.max.apply(Math, folderNames.map(fname => fname.match(/\d+/)?.[0] || 0).map(val => val * 1))
+    helper.log2('maxDoneSn', maxDoneSn)
+
+    if (newestLinkInfo.sn * 1 > maxDoneSn) {
+      helper.log2('发现新的资源:', maxDoneSn + 1, '~', newestLinkInfo.sn)
+    } else {
+      helper.log2('没有新的资源:', newestLinkInfo)
+    }
+    
+
+  } 
   
   // 下载目标链接页面 和 想要的网络请求资源
   async download(skipCache) {
