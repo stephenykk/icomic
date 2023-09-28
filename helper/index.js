@@ -347,6 +347,7 @@ async function downPage(url, urlInfo = {}) {
 
             let resUrl = response.url();
             const status = response.status();
+            const contentType = response.headers()['content-type']
             if (status === 302) {
                 log("got 302 response:", resUrl);
                 linksOf302.push(resUrl);
@@ -359,14 +360,14 @@ async function downPage(url, urlInfo = {}) {
             // }
 
             // log('on response file:', resFile)
-            log("on response url:", status, resUrl);
+            log("on response url:", status, contentType, resUrl);
 
             if (resUrl.includes('m3u8')) {
                 log2('==> on response m3u8 rel:', resUrl)
             }
 
             let wanted = false;
-            if (isMp4) {
+            if (isMp4 && /mp4/.test(contentType)) {
                 wanted = reList.some((re) => re.test(resUrl));
             } else {
                 wanted = reList.some((re) => re.test(normalResUrl));
@@ -505,7 +506,7 @@ async function downPage(url, urlInfo = {}) {
             referer: config.listPage.url,
             waitUntil: "networkidle0",
             // waitUntil: "load",
-            timeout: 90 * 1000,
+            timeout: 20 * 1000,
             // timeout: 10 * 1000,
         })
         .catch((err) => {
@@ -545,11 +546,25 @@ async function downPage(url, urlInfo = {}) {
         console.log("🚀 ~ file: index.js:541 ~ jsResult ~ frameEles.length:", frameEles.length, window.frames.length)
 
         const vidDiv = document.querySelector('#playbox')
-        const frameSrc = frameEles?.[0]?.getAttribute('src') ?? 'https://tup.yinghua8.tv/?vid=' + vidDiv?.getAttribute('data-vid')
+        let frameSrc = frameEles?.[0]?.getAttribute('src') ?? 'https://tup.yinghua8.tv/?vid=' + vidDiv?.getAttribute('data-vid')
         
         if (isIframe && frameSrc) {
+            let newHref = location.href
             console.log("🚀 ~ file: index.js:542 ~ jsResult ~ frameSrc:", frameSrc)
-            location.href = frameSrc
+            if (frameSrc.match(/^(https?:)?\/\//)) {
+                newHref = frameSrc
+            } else {
+                let oUrl = new URL(location.href)
+                if (frameSrc.startsWith('/')) {
+                    newHref = oUrl.origin + frameSrc
+                } else {
+                    newHref = oUrl.origin + oUrl.pathname.replace(/\/\w+$/, '/') + frameSrc.replace(/^\.\//, '')
+                }
+            }
+
+            location.href = newHref
+            frameSrc = newHref
+
             return {frameSrc}
         }
 
@@ -571,7 +586,7 @@ async function downPage(url, urlInfo = {}) {
     if (jsResult && jsResult.frameSrc) {
 
         log2('重定向到新的地址 ', jsResult.frameSrc)
-        await page.goto(jsResult.frameSrc, {waitUntil: 'networkidle0'})
+        await page.goto(jsResult.frameSrc, {waitUntil: 'networkidle0', timeout: 60 * 1000})
     }
     // closeBrowserTimer = setTimeout(async() => {
     //   log2('at last before close browser...');
