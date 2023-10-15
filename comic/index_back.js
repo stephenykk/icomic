@@ -1,128 +1,28 @@
 const fs = require("fs-extra");
 const urlTool = require("url");
 const path = require("path");
-const axios = require("axios");
-const config = require("../config/index.js");
+const configModule = require("../config/index.js");
+const config = configModule.data;
 const { runCommand, spawnCommand } = require("./runCommand.js");
-
+const {
+    isStream,
+    isUrl,
+    log,
+    log2,
+    sleep,
+    setCacheList,
+    getCacheList,
+    axios,
+    download,
+    output,
+} = require("./common.js");
 const puppeteer = require("puppeteer");
-
-axios.defaults.timeout = 40 * 1000;
-axios.defaults.headers["User-Agent"] =
-    "Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0";
-
-function isStream(result) {
-    return result && typeof result.pipe === "function";
-}
-
-function isUrl(str) {
-    return /^(https?:)?\/\//.test(str);
-}
-
-function log(...args) {
-    console.log(":::", ...args);
-}
-
-function log2(...args) {
-    console.log("\n", ...args, "\n");
-}
-
-// download comic pic
-async function download(
-    url,
-    outDir = "",
-    responseType = "stream",
-    outputCallback
-) {
-    log("downloading :", url);
-    let fname = path.basename(url);
-    // res is object, res.data is stream
-    let res = await axios.get(url, { responseType }).catch((err) => {
-        log2("DOWN FAIL:", fname, err.message);
-        return false;
-    });
-    // debugger;
-
-    if (!res) {
-        return false;
-    }
-
-    let outResult = await output(url, res.data, outDir, outputCallback);
-    return outResult;
-}
-
-function output(fname, con, outDir, outputCallback) {
-    if (isUrl(fname)) {
-        fname = path.basename(fname);
-        fname = fname.replace(/\?.*$/, "");
-    }
-    outDir = outDir || config.output;
-    fs.ensureDirSync(outDir);
-
-    let outFile = path.resolve(outDir, fname);
-    // if exists , rename new file
-    /* if (fs.existsSync(outFile)) {
-    outFile = outFile.replace(/\.\w+$/, "_" + 2 + "$&");
-  } */
-
-    return new Promise((resolve) => {
-        if (isStream(con)) {
-            let ws = fs.createWriteStream(outFile, { flags: "w" });
-            let rs = con;
-            rs.pipe(ws);
-            ws.on("finish", () => {
-                log("output ok:", fname);
-                if (typeof outputCallback === "function") {
-                    outputCallback(outFile);
-                }
-                resolve(true);
-            });
-        } else {
-            let err = fs.writeFileSync(outFile, con, { encoding: "utf8" });
-            if (err) {
-                log2("output err:", err);
-                resolve(false);
-            } else {
-                log("output file:", fname, outFile);
-
-                if (typeof outputCallback === "function") {
-                    outputCallback(outFile);
-                }
-
-                resolve(true);
-            }
-        }
-    });
-}
-
-function listJsonFilePath() {
-    var downName = process.argv[3] || "hello";
-    var fpath = path.resolve(__dirname, "../output", downName, "list.json");
-
-    return fpath;
-}
-
-function getCacheList() {
-    var fpath = listJsonFilePath();
-    let exists = fs.existsSync(fpath);
-    return exists ? fs.readJsonSync(fpath) : false;
-}
-
-function setCacheList(data) {
-    var fpath = listJsonFilePath();
-
-    fs.outputJSON(fpath, data);
-}
-
-function sleep(seconds) {
-    return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
-}
 
 async function getList(skipCache) {
     if (!config.nocache && !skipCache) {
         let cached = getCacheList();
         if (cached) {
-            helper.log("GET LIST FROM CACHE", cached);
+            log("GET LIST FROM CACHE", cached);
             return cached;
         }
     }
@@ -227,26 +127,27 @@ function getResourceUrl(refUrl, resourcePath) {
 }
 
 async function getRedirectUrl(resUrl, resourcePath) {
-  const resourceUrl = getResourceUrl(resUrl, resourcePath)
-  const res = await axios.get(resourceUrl) // 若发生重定向，axios会获取重定向后的请求的结果
-  const headers = res.headers || {}
-  const location = headers.location || headers.Location
-  log2('got location:', location);
-  return location 
+    const resourceUrl = getResourceUrl(resUrl, resourcePath);
+    const res = await axios.get(resourceUrl); // 若发生重定向，axios会获取重定向后的请求的结果
+    const headers = res.headers || {};
+    const location = headers.location || headers.Location;
+    log2("got location:", location);
+    return location;
 }
 
 async function getNewM3u8By302(resData, resUrl) {
-  const lines = resData.split('\n')
-  for(let i = 0; i < lines.length; i++) {
-    const line = lines[i]
-    if (/#EXTINF/.test(line)) {
-      lines[i + 1] = await getRedirectUrl(resUrl, lines[i + 1]) || lines[ i + 1 ]
+    const lines = resData.split("\n");
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (/#EXTINF/.test(line)) {
+            lines[i + 1] =
+                (await getRedirectUrl(resUrl, lines[i + 1])) || lines[i + 1];
+        }
     }
-  }
 
-  const newResData = lines.join('\n')
-  log2('-----------> getNewM3u8By302 newResData:', newResData)
-  return newResData
+    const newResData = lines.join("\n");
+    log2("-----------> getNewM3u8By302 newResData:", newResData);
+    return newResData;
 }
 
 var closeBrowserTimer;
@@ -282,7 +183,7 @@ async function downPage(url, urlInfo = {}) {
     const outputOneCallback = async () => {
         // outputListeners.forEach(cb => cb())
         if (outputCount >= expectCount) {
-            helper.log2("before close browser!");
+            log2("before close browser!");
             await sleep(2);
             // await browser.close();
             await closeBrowser();
@@ -315,7 +216,7 @@ async function downPage(url, urlInfo = {}) {
 
     let gotoDone = false;
     const page = await browser.newPage();
-    await page.setViewport({width: 1400, height: 800})
+    await page.setViewport({ width: 1400, height: 800 });
     const { root = "", nextBtn = "" } = config.detailPage.selector || {};
     const clickNextBtn = async function () {
         const selector = (root + " " + nextBtn).trim();
@@ -347,7 +248,7 @@ async function downPage(url, urlInfo = {}) {
 
             let resUrl = response.url();
             const status = response.status();
-            const contentType = response.headers()['content-type']
+            const contentType = response.headers()["content-type"];
             if (status === 302) {
                 log("got 302 response:", resUrl);
                 linksOf302.push(resUrl);
@@ -362,8 +263,8 @@ async function downPage(url, urlInfo = {}) {
             // log('on response file:', resFile)
             log("on response url:", status, contentType, resUrl);
 
-            if (resUrl.includes('m3u8')) {
-                log2('==> on response m3u8 rel:', resUrl)
+            if (resUrl.includes("m3u8")) {
+                log2("==> on response m3u8 rel:", resUrl);
             }
 
             let wanted = false;
@@ -414,14 +315,14 @@ async function downPage(url, urlInfo = {}) {
 
                 log("on reponse file, getting buffer:", resFile);
                 // let buf = isMp4 ? false : await response.buffer();
-                let buf = null 
+                let buf = null;
                 if (isMp4) {
-                    buf = false
+                    buf = false;
                 } else {
                     try {
-                        buf = await response.buffer()
-                    }catch(err) {
-                        log2('response.buffer() got some error::', err)
+                        buf = await response.buffer();
+                    } catch (err) {
+                        log2("response.buffer() got some error::", err);
                     }
                 }
                 // log(resFile, 'CONTENT:', buf.toString('utf8'))
@@ -453,7 +354,7 @@ async function downPage(url, urlInfo = {}) {
                 }
 
                 if (callback && typeof callback === "function") {
-                    const needRedirect = false
+                    const needRedirect = false;
                     if (needRedirect && isM3u8 && buf) {
                         const resData = buf.toString();
                         const infLineRe = /#EXTINF/;
@@ -467,12 +368,16 @@ async function downPage(url, urlInfo = {}) {
                             const firstTsLine = lines[firstTsIdx];
                             const isExpectedType =
                                 /\.(ts|png|jpe?g)(\?.*)?$/.test(resUrl);
-                                if (!isExpectedType) {
-                              // await sleep(20); // wait for 302 happend
-                              const location = await getRedirectUrl(resUrl, firstTsLine)
-                              const shouldRedirect = linksOf302.includes(firstTsLine)
-                              if (shouldRedirect) {
-                                log2('开始执行重定向更新索引文件..')
+                            if (!isExpectedType) {
+                                // await sleep(20); // wait for 302 happend
+                                const location = await getRedirectUrl(
+                                    resUrl,
+                                    firstTsLine
+                                );
+                                const shouldRedirect =
+                                    linksOf302.includes(firstTsLine);
+                                if (shouldRedirect) {
+                                    log2("开始执行重定向更新索引文件..");
                                     const newResData = await getNewM3u8By302(
                                         resData,
                                         resUrl
@@ -536,36 +441,53 @@ async function downPage(url, urlInfo = {}) {
     //     await sleep(18)
     // }
 
-
     const jsResult = await page.evaluate((config) => {
         console.log("detail config:", JSON.stringify(config));
         let root = document;
         let selector = config.detailPage.selector;
         const isIframe = config.detailPage.isIframe;
-        const frameEles = Array.from(document.querySelectorAll('iframe')).filter(frame => frame.getAttribute('src') && frame.getAttribute('src').match(/^(http|\/)/))
-        console.log("🚀 ~ file: index.js:541 ~ jsResult ~ frameEles.length:", frameEles.length, window.frames.length)
+        const frameEles = Array.from(
+            document.querySelectorAll("iframe")
+        ).filter(
+            (frame) =>
+                frame.getAttribute("src") &&
+                frame.getAttribute("src").match(/^(http|\/)/)
+        );
+        console.log(
+            "🚀 ~ file: index.js:541 ~ jsResult ~ frameEles.length:",
+            frameEles.length,
+            window.frames.length
+        );
 
-        const vidDiv = document.querySelector('#playbox')
-        let frameSrc = frameEles?.[0]?.getAttribute('src') ?? 'https://tup.yinghua8.tv/?vid=' + vidDiv?.getAttribute('data-vid')
-        
+        const vidDiv = document.querySelector("#playbox");
+        let frameSrc =
+            frameEles?.[0]?.getAttribute("src") ??
+            "https://tup.yinghua8.tv/?vid=" + vidDiv?.getAttribute("data-vid");
+
         if (isIframe && frameSrc) {
-            let newHref = location.href
-            console.log("🚀 ~ file: index.js:542 ~ jsResult ~ frameSrc:", frameSrc)
+            let newHref = location.href;
+            console.log(
+                "🚀 ~ file: index.js:542 ~ jsResult ~ frameSrc:",
+                frameSrc
+            );
             if (frameSrc.match(/^(https?:)?\/\//)) {
-                newHref = frameSrc
+                newHref = frameSrc;
             } else {
-                let oUrl = new URL(location.href)
-                if (frameSrc.startsWith('/')) {
-                    newHref = oUrl.origin + frameSrc
+                let oUrl = new URL(location.href);
+                if (frameSrc.startsWith("/")) {
+                    newHref = oUrl.origin + frameSrc;
                 } else {
-                    newHref = oUrl.origin + oUrl.pathname.replace(/\/\w+$/, '/') + frameSrc.replace(/^\.\//, '')
+                    newHref =
+                        oUrl.origin +
+                        oUrl.pathname.replace(/\/\w+$/, "/") +
+                        frameSrc.replace(/^\.\//, "");
                 }
             }
 
-            location.href = newHref
-            frameSrc = newHref
+            location.href = newHref;
+            frameSrc = newHref;
 
-            return {frameSrc}
+            return { frameSrc };
         }
 
         if (!selector) return;
@@ -581,12 +503,17 @@ async function downPage(url, urlInfo = {}) {
         // console.log("detail config:", config);
     }, config);
 
-    console.log("🚀 ~ file: index.js:561 ~ //awaitpage.goto ~ jsResult:", jsResult)
+    console.log(
+        "🚀 ~ file: index.js:561 ~ //awaitpage.goto ~ jsResult:",
+        jsResult
+    );
 
     if (jsResult && jsResult.frameSrc) {
-
-        log2('重定向到新的地址 ', jsResult.frameSrc)
-        await page.goto(jsResult.frameSrc, {waitUntil: 'networkidle0', timeout: 60 * 1000})
+        log2("重定向到新的地址 ", jsResult.frameSrc);
+        await page.goto(jsResult.frameSrc, {
+            waitUntil: "networkidle0",
+            timeout: 60 * 1000,
+        });
     }
     // closeBrowserTimer = setTimeout(async() => {
     //   log2('at last before close browser...');
@@ -594,10 +521,6 @@ async function downPage(url, urlInfo = {}) {
     // }, 5000);
 
     return downPromise;
-}
-
-function sleep(seconds = 1) {
-    return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
 }
 
 var helper = {
