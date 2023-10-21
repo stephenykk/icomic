@@ -16,14 +16,15 @@ function usage() {
 }
 
 function autoCdown() {
-    usage 3 ${#@} "bash autoCdown.sh <dir> <from> <to>" || return 1
+    usage 2 ${#@} "bash autoCdown.sh <dir> <from> [to]" || return 1
     local dir="$1"
     local from="$2"
-    local to="$3"
+    local to="${3:-$from}"
+
     for n in `seq $from $to`
     do
         echo ":: CMD -> " yarn cdown $dir/$n
-        yarn cdown $dir/$n
+        yarn cdown $dir/$n || return 1
     done
 }
 

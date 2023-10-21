@@ -28,8 +28,21 @@ async function getList(skipCache) {
         }
     }
 
+    const headless = "new";
     const browser = await puppeteer.launch({
-        headless: "new",
+        executablePath:
+            "C:\\Users\\pan\\AppData\\Local\\google\\Chrome\\Application\\chrome.exe",
+
+        // headless: "new",
+        // headless: false,
+        headless,
+
+        // headless: true,
+
+        userDataDir:
+            "C:\\Users\\Administrator\\AppData\\Local\\Google\\Chrome\\User Data\\Default",
+
+        devtools: true,
         args: ["--lang=zh-CN"],
     });
     // const browser = await puppeteer.launch({ headless: false });
@@ -117,7 +130,7 @@ async function getList(skipCache) {
 
         if (!links.length) {
             console.log(
-                "==> KK: 获取不到sn链接, 可能有反爬, body html:",
+                "==> KK: 获取不到sn链接, 可能有反爬, 可尝试设置 headless: new, body html:",
                 document.body.innerHTML,
                 "cookie::",
                 document.cookie
@@ -142,7 +155,11 @@ async function getList(skipCache) {
         `===>>> GOT LINKS ${top ? "of top " + top : ""}:`,
         top ? links.slice(0, top) : links
     );
-    await browser.close();
+
+    log2("WILL CLOSE BROWSER, headless:", headless);
+    if (headless) {
+        await browser.close();
+    }
 
     printLatestDown();
     setCacheList(links);

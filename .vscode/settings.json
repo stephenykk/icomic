@@ -2,8 +2,10 @@
     "editor.formatOnSave": true,
     "cSpell.words": [
         "agentkeepalive",
+        "cback",
         "cclear",
         "cdown",
+        "cfavs",
         "clist",
         "cout",
         "coutput",

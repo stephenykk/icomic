@@ -109,7 +109,7 @@ async function downPage(url, urlInfo = {}) {
     const closeBrowser = async () => {
         log2("WILL CLOSE BROWSER");
 
-        await sleep(3);
+        await sleep(4);
         if (gotoDone) {
             return await browser.close();
         } else {
@@ -123,9 +123,14 @@ async function downPage(url, urlInfo = {}) {
         // executablePath: '/usr/lib/chromium-browser/chromium-browser',
         executablePath:
             "C:\\Users\\pan\\AppData\\Local\\google\\Chrome\\Application\\chrome.exe",
-        headless: true,
-        // headless: "new",
+        userDataDir:
+            "C:\\Users\\Administrator\\AppData\\Local\\Google\\Chrome\\User Data\\Default",
+
+        // headless: true,
+
+        headless: "new",
         // headless: false,
+
         devtools: true,
     });
 
@@ -167,7 +172,8 @@ async function downPage(url, urlInfo = {}) {
                 await sleep(1);
                 log2("====> GOTO FRAME:", frame.url(), "isIframe:", isIframe);
                 // isIframe && (await page.goto(frame.url(), { waitUntil: "load" }));
-                await page.goto(frame.url(), { waitUntil: "load" });
+                // await page.goto(frame.url(), { waitUntil: "load" });
+                await page.goto(frame.url(), { waitUntil: "domcontentloaded" });
             }
         });
     });
@@ -183,7 +189,15 @@ async function downPage(url, urlInfo = {}) {
             const status = response.status();
             const contentType = response.headers()["content-type"];
             if (status === 302) {
-                log("got 302 response:", resUrl);
+                const location = response.headers()["location"];
+                log2(
+                    "got 302 response:",
+                    "location:",
+                    location,
+                    "\n",
+                    "resUrl:",
+                    resUrl
+                );
                 linksOf302.push(resUrl);
             }
             let normalResUrl = decodeURIComponent(resUrl.split("?")[0]);
@@ -207,7 +221,7 @@ async function downPage(url, urlInfo = {}) {
                 resUrl
             );
 
-            if (resUrl.includes("m3u8")) {
+            if (resUrl.includes(".m3u8")) {
                 log2("=========>>>> ON RESPONSE M3U8 resUrl:", resUrl);
             }
 
@@ -225,8 +239,8 @@ async function downPage(url, urlInfo = {}) {
 
             if (wanted) {
                 log2("wanted ==>", wanted, "isMp4 =>", isMp4);
+                const status = response.status();
                 if (isMp4) {
-                    const status = response.status();
                     const headers = response.headers();
                     log2(
                         "content-type status:",
@@ -243,11 +257,17 @@ async function downPage(url, urlInfo = {}) {
                     if (!wanted) return;
                 }
 
-                log2("====>>> GOT WANTED,", normalResUrl);
+                log2("====>>> GOT WANTED,", status, normalResUrl);
 
                 // parse sn from title
 
-                let title = await page.title();
+                let title = "";
+                try {
+                    await page.title();
+                } catch (err) {
+                    log("get page.title() error:", err);
+                }
+
                 let sn =
                     urlInfo.sn ||
                     (title.match(/\d+/g) ? title.match(/\d+/g)[0] : "");
@@ -268,8 +288,11 @@ async function downPage(url, urlInfo = {}) {
                     }
                 }
                 // log(resFile, 'CONTENT:', buf.toString('utf8'))
-
-                if (conCheck) {
+                const defConCheck = function (con) {
+                    return /X-ENDLIST/im.test(con);
+                };
+                conCheck = conCheck || defConCheck;
+                if (!isMp4 && buf && conCheck) {
                     // check content, ensure it is wanted response
                     let conOK = conCheck(buf.toString("utf8"));
                     if (!conOK) {
@@ -292,6 +315,11 @@ async function downPage(url, urlInfo = {}) {
                     // await spawnCommand('curl', [`-o ${sn}.mp4`, `${resUrl}`])
                     // await runCommand(`curl -o ${outDir}${path.sep}index.mp4 "${resUrl}"`)
                 } else {
+                    if (!buf) {
+                        log2("GET BUF FAIL, NOT WANTED", buf);
+                        wanted = false;
+                        return;
+                    }
                     await output(resUrl, buf, outDir);
                 }
 

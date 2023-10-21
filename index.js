@@ -58,7 +58,9 @@ class IComic {
             })
         );
         // log2(Object.keys(myconfig));
-        log2(Object.keys(favConfig).sort().join("\n"));
+        const favList = Object.keys(favConfig).sort().join("\n");
+        log2(favList);
+        fs.outputFileSync(path.join(__dirname, "output/fav.txt"), favList);
     }
 
     // 获取目标链接列表
@@ -121,6 +123,11 @@ class IComic {
             .sort((infoA, infoB) => infoA.sn * 1 - infoB.sn * 1)
             .pop();
         log2("newestLinkInfo:", newestLinkInfo);
+
+        if (!newestLinkInfo) {
+            return;
+        }
+
         const outDir = path.resolve(__dirname, config.output);
         const folderNames = fs
             .readdirSync(outDir)
@@ -140,22 +147,35 @@ class IComic {
         log2("maxDoneSn", maxDoneSn);
 
         const diff = newestLinkInfo.sn * 1 - maxDoneSn;
+        const newJsonFilePath = path.join(listJsonFilePath(), "../new.json");
         if (diff > 0) {
             log2("发现新的资源:", maxDoneSn + 1, "~", newestLinkInfo.sn);
             const newSnList = Array.from(
                 { length: diff },
                 (_, i) => i + 1 + maxDoneSn
             );
-            const newJsonFilePath = path.join(
-                listJsonFilePath(),
-                "../new.json"
-            );
             fs.outputJSON(newJsonFilePath, newSnList);
         } else {
             log2("没有新的资源:", newestLinkInfo);
+            fs.outputJSON(newJsonFilePath, []);
         }
     }
 
+    downloadUsage(action) {
+        const isOK = dirName;
+        logWithLines(
+            `${"Usage".padStart(
+                10
+            )}: node index.js ${action} <dirName> [downSn]\n${"Example".padStart(
+                10
+            )}: node index.js ${action} wanmei 10-13\n${"Example".padStart(
+                10
+            )}: node index.js ${action} wanmei 10\n${"Example".padStart(
+                10
+            )}: node index.js ${action} wanmei 10,13`
+        );
+        return isOK;
+    }
     // 下载目标链接页面 和 想要的网络请求资源
     async download() {
         let downUrls = [];
@@ -177,7 +197,7 @@ class IComic {
         log2("downUrls:", downUrls);
 
         for (let url of downUrls) {
-            log(`----------------- downloading ${url} -----------------`);
+            log(`--------- downloading ${config.output} ${url} ---------`);
             await downPage(url, urlInfos[url]);
         }
     }

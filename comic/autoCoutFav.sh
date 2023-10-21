@@ -15,6 +15,7 @@ function usage() {
     return 0
 }
 
+
 function getFirst() {
     local dirName="$1"
     local first=`cat ./output/$dirName/new.json | sed 's/\[\|\]//g' | awk -F, '{print $1}'`
@@ -26,19 +27,19 @@ function getLast() {
     echo $last
 }
 
-function autoDown() {
-    usage 0 ${#@} "bash autoDown.sh" || return 1
-    
-    
+
+function autoCoutFav() {
+    usage 0 ${#@} "bash autoCoutFav.sh" || return 1
+
     for dirName in `cat ./output/fav.tmp`
     do
         local from=`getFirst $dirName`
         local to=`getLast $dirName`
         if [ "$from" -a "$to" ]; then
-            echo yarn down $dirName "$from-$to"
-            yarn down $dirName "$from-$to" || return 1
+            bash ./comic/autoCout.sh $dirName $from $to || return 1
         fi
     done
+
 }
 
-autoDown $@
+autoCoutFav $@
