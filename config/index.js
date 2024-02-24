@@ -40,7 +40,7 @@ function getConfig(name) {
     let realConfig = { ...config, ...myconfig, ...yoconfig };
     let nameList = Object.keys(realConfig);
 
-    log2(nameList, name);
+    // log2(nameList, name);
 
     if (!nameList.includes(name)) {
         log2("===> BAD NAME:", name);

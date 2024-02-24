@@ -1,7 +1,13 @@
 const path = require("path");
 const fs = require("fs-extra");
+const isDown = process.argv[2] || 0;
 
 const outputRootDir = path.resolve(__dirname, "../output");
+const comicRootDir = path.resolve(__dirname, "../comic");
+const favNames = fs
+    .readFileSync(path.join(outputRootDir, "fav.txt"), "utf8")
+    .split("\n")
+    .filter((v) => v);
 
 function getCartoonDir(name) {
     return path.join(outputRootDir, name);
@@ -21,10 +27,12 @@ function getSubFolders(root) {
 // const ls = getSubFolders(backupRootDir);
 // console.log("🚀 ~ file: copy.js:25 ~ ls:", ls);
 
-function getCartoonData() {
-    const cartoonNames = getSubFolders(outputRootDir);
+function getNewCartoonData() {
+    const cartoonNames = getSubFolders(outputRootDir).filter((name) =>
+        favNames.includes(name)
+    );
 
-    const cartoonData = cartoonNames.reduce((data, name) => {
+    const newCartoonData = cartoonNames.reduce((data, name) => {
         const dir = getCartoonDir(name);
         const newJsonFile = path.join(dir, "new.json");
 
@@ -38,7 +46,7 @@ function getCartoonData() {
         return data;
     }, {});
 
-    return cartoonData;
+    return newCartoonData;
 }
 
 function getSubFiles(root) {
@@ -46,10 +54,15 @@ function getSubFiles(root) {
 }
 
 function listNewer() {
-    const cartoonData = getCartoonData();
+    const newCartoonData = getNewCartoonData();
     console.log(
-        "🚀 ~ file: listNewer.js:47 ~ listNewer ~ cartoonData:",
-        cartoonData
+        "🚀 ~ file: listNewer.js:50 ~ listNewer ~ newCartoonData:",
+        newCartoonData
     );
+
+    if (isDown) {
+        const scripts = [];
+        fs.writeFileSync();
+    }
 }
 listNewer();

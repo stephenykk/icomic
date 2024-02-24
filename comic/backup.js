@@ -81,18 +81,30 @@ function handleBackup() {
                 }
             } else if (mode === "clear") {
                 if (existsInBackup) {
-                    const mp4Fname = fs
-                        .readdirSync(srcDir)
-                        .filter((name) => name.match(/mp4$/))[0];
-                    if (mp4Fname) {
-                        const mp4File = path.join(srcDir, mp4Fname);
-                        console.log("DELETING CARTOON FILE:", mp4File);
-                        fs.removeSync(mp4File);
+                    const ok = rmMp4(srcDir);
+                    if (!ok) {
+                        const decDir = path.join(srcDir, "dec");
+                        if (fs.existsSync(decDir)) {
+                            rmMp4(decDir);
+                        }
                     }
                 }
             }
         }
     }
+}
+
+function rmMp4(srcDir) {
+    let mp4Fname = fs
+        .readdirSync(srcDir)
+        .filter((name) => name.match(/mp4$/))[0];
+    if (mp4Fname) {
+        const mp4File = path.join(srcDir, mp4Fname);
+        console.log("DELETING CARTOON FILE:", mp4File);
+        fs.removeSync(mp4File);
+        return true;
+    }
+    return false;
 }
 
 // node backup.js <mode:back|clear>

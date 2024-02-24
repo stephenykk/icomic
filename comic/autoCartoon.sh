@@ -16,8 +16,8 @@ function usage() {
 }
 
 function autoCartoon() {
-    usage 3 ${#@} "bash autoCartoon.sh <dir> <from> <to>" || return 1
-    bash ./autoCdown.sh  $@ && bash ./autoCout.sh $@
+    usage 2 ${#@} "bash autoCartoon.sh <dir> <from> [to]" || return 1
+    bash ./comic/autoCdown.sh  $@ && bash ./comic/autoCout.sh $@
 }
 
 autoCartoon $@

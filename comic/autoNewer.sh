@@ -21,8 +21,8 @@ function autoNewer() {
     # yarn clist
     # sleep 5
 
-    # for dirName in `cat ./output/fav.txt`
-    for dirName in `cat ./output/fav.tmp`
+    for dirName in `cat ./output/fav.txt`
+    # for dirName in `cat ./output/fav.tmp`
     do
         echo yarn newer $dirName
         yarn newer $dirName || return 1

@@ -31,7 +31,8 @@ function getLast() {
 function autoCoutFav() {
     usage 0 ${#@} "bash autoCoutFav.sh" || return 1
 
-    for dirName in `cat ./output/fav.tmp`
+    # for dirName in `cat ./output/fav.tmp`
+    for dirName in `cat ./output/fav.txt`
     do
         local from=`getFirst $dirName`
         local to=`getLast $dirName`

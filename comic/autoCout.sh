@@ -22,8 +22,15 @@ function autoCout() {
     local to="${3:-$from}"
     for n in `seq $from $to`
     do
-        echo ":: CMD -> " yarn cout $dir/$n
-        yarn cout $dir/$n
+
+        if [ -d "cartoon/$dir/$n/dec" ]
+        then
+            echo ":: CMD -> " yarn cout $dir/$n/dec
+            yarn cout $dir/$n/dec
+        else
+            echo ":: CMD -> " yarn cout $dir/$n
+            yarn cout $dir/$n
+        fi
     done
 }
 

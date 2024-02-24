@@ -29,6 +29,7 @@ async function getList(skipCache) {
     }
 
     const headless = "new";
+    // const headless = false;
     const browser = await puppeteer.launch({
         executablePath:
             "C:\\Users\\pan\\AppData\\Local\\google\\Chrome\\Application\\chrome.exe",
@@ -42,7 +43,7 @@ async function getList(skipCache) {
         userDataDir:
             "C:\\Users\\Administrator\\AppData\\Local\\Google\\Chrome\\User Data\\Default",
 
-        devtools: true,
+        // devtools: true,
         args: ["--lang=zh-CN"],
     });
     // const browser = await puppeteer.launch({ headless: false });
@@ -111,8 +112,14 @@ async function getList(skipCache) {
 
     // evaluate callback
     // 页面打开后，执行自定义回调，并传入config对象
-    const links = await page.evaluate((config) => {
+    let links = await page.evaluate((config) => {
         // console.log('========', JSON.stringify(config))
+        console.log(
+            "=====> KKK",
+            JSON.stringify(config),
+            "selector: ",
+            config.listPage.selector
+        );
         let root = document;
         let selector = config.listPage.selector;
         if (Array.isArray(config.listPage.selector)) {
@@ -127,6 +134,7 @@ async function getList(skipCache) {
         }
 
         var links = root.querySelectorAll(selector);
+        console.log("links.length:::", links.length);
 
         if (!links.length) {
             console.log(
@@ -140,9 +148,12 @@ async function getList(skipCache) {
         }
         links = Array.from(links);
         links = links.map((link) => [link.href, link.textContent]);
+        console.log("links:::", JSON.stringify(links));
         return links;
         // return document.title
     }, config);
+
+    links = links || [];
 
     // make sure desc order
     links.sort((a, b) => {

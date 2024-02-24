@@ -96,6 +96,7 @@ async function downPage(url, urlInfo = {}) {
             log2("before close browser!");
             await sleep(2);
             // await browser.close();
+            // await closeBrowser();
             await closeBrowser();
             resolve(true);
         } else {
@@ -110,10 +111,15 @@ async function downPage(url, urlInfo = {}) {
         log2("WILL CLOSE BROWSER");
 
         await sleep(4);
-        if (gotoDone) {
-            return await browser.close();
-        } else {
-            return await closeBrowser();
+
+        try {
+            if (gotoDone) {
+                await browser.close();
+            } else {
+                closeBrowser();
+            }
+        } catch (err) {
+            log2("close browser error::", err);
         }
     };
 
@@ -164,15 +170,34 @@ async function downPage(url, urlInfo = {}) {
     let hasJumpFrame = false;
     page.on("frameattached", (frame) => {
         log2("FRAME ATTACHED CALLBACK~~");
+
+        // return;
+
+        if (page.hasOutput) return;
+
         const frmPage = frame.page();
+        const frameUrl = frame.url() || "";
+
+        log2("FRAME URL is:", frameUrl);
+
+        if (!frameUrl) return;
+
         frmPage.on("response", async (resp) => {
-            const frameUrl = frame.url() || "";
+            if (page.hasOutput) return;
+
             if (!hasJumpFrame && frameUrl.startsWith("http")) {
                 hasJumpFrame = true;
                 await sleep(1);
-                log2("====> GOTO FRAME:", frame.url(), "isIframe:", isIframe);
+                log2(
+                    "====> TEMP STOP GOTO FRAME:",
+                    frame.url(),
+                    "isIframe:",
+                    isIframe
+                );
                 // isIframe && (await page.goto(frame.url(), { waitUntil: "load" }));
                 // await page.goto(frame.url(), { waitUntil: "load" });
+
+                // KK: temp disable goto new page
                 await page.goto(frame.url(), { waitUntil: "domcontentloaded" });
             }
         });
@@ -183,6 +208,7 @@ async function downPage(url, urlInfo = {}) {
         const doneSet = new Set();
         const linksOf302 = [];
         page.on("response", async (response) => {
+            if (page.hasOutput) return;
             if (outputCount >= expectCount) return;
 
             let resUrl = response.url();
@@ -227,7 +253,7 @@ async function downPage(url, urlInfo = {}) {
 
             let wanted = false;
             if (isMp4 && /mp4/.test(contentType)) {
-                wanted = reList.some((re) => re.test(resUrl));
+                wanted = status === 206 || reList.some((re) => re.test(resUrl));
             } else {
                 wanted = reList.some((re) => re.test(normalResUrl));
             }
@@ -239,7 +265,7 @@ async function downPage(url, urlInfo = {}) {
 
             if (wanted) {
                 log2("wanted ==>", wanted, "isMp4 =>", isMp4);
-                const status = response.status();
+                // const status = response.status();
                 if (isMp4) {
                     const headers = response.headers();
                     log2(
@@ -257,13 +283,16 @@ async function downPage(url, urlInfo = {}) {
                     if (!wanted) return;
                 }
 
-                log2("====>>> GOT WANTED,", status, normalResUrl);
-
                 // parse sn from title
 
                 let title = "";
                 try {
-                    await page.title();
+                    await Promise.race[
+                        (new Promise((resolveFn) =>
+                            setTimeout(() => resolveFn(""), 1000)
+                        ),
+                        page.title())
+                    ];
                 } catch (err) {
                     log("get page.title() error:", err);
                 }
@@ -274,6 +303,22 @@ async function downPage(url, urlInfo = {}) {
                 sn = sn + "";
                 response.sn = sn;
                 let outDir = path.resolve(config.output, sn);
+
+                log2("====>>> GOT WANTED,", status, normalResUrl);
+
+                if (status === 302 || status === 301) {
+                    wanted = false;
+                    const location = response.headers()["location"];
+                    log2("----> 302 location:", location);
+                    outputCount += 1;
+                    fs.ensureDirSync(outDir);
+                    const outFile = `${outDir}${path.sep}index.m3u8`;
+                    page.hasOutput = true;
+                    await spawnCommand("curl", ["-o", outFile, location]);
+
+                    outputOneCallback();
+                    return false;
+                }
 
                 log("on reponse file, getting buffer:", resFile);
                 // let buf = isMp4 ? false : await response.buffer();
@@ -289,7 +334,9 @@ async function downPage(url, urlInfo = {}) {
                 }
                 // log(resFile, 'CONTENT:', buf.toString('utf8'))
                 const defConCheck = function (con) {
-                    return /X-ENDLIST/im.test(con);
+                    return (
+                        /X-ENDLIST/im.test(con) && con.split(/\n/).length > 50
+                    );
                 };
                 conCheck = conCheck || defConCheck;
                 if (!isMp4 && buf && conCheck) {
@@ -298,7 +345,8 @@ async function downPage(url, urlInfo = {}) {
                     if (!conOK) {
                         buf = "URL IS:" + "\n" + resUrl + "\n" + buf.toString();
                         wanted = false;
-                        log2("m3u8 content not ok...");
+                        log2("m3u8 content not ok..., and will close browser");
+                        closeBrowser();
                     }
                 }
 
@@ -311,6 +359,7 @@ async function downPage(url, urlInfo = {}) {
                 if (isMp4) {
                     fs.ensureDirSync(outDir);
                     const outFile = `${outDir}${path.sep}index.mp4`;
+                    page.hasOutput = true;
                     await spawnCommand("curl", ["-o", outFile, resUrl]);
                     // await spawnCommand('curl', [`-o ${sn}.mp4`, `${resUrl}`])
                     // await runCommand(`curl -o ${outDir}${path.sep}index.mp4 "${resUrl}"`)
@@ -320,6 +369,8 @@ async function downPage(url, urlInfo = {}) {
                         wanted = false;
                         return;
                     }
+
+                    page.hasOutput = true;
                     await output(resUrl, buf, outDir);
                 }
 
