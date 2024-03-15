@@ -15,12 +15,17 @@ function isUrl(str) {
     return /^(https?:)?\/\//.test(str);
 }
 
+function ts() {
+    const time = new Date().toLocaleString();
+    return `[${time.replace(/^\d+:/, "")}]`;
+}
+
 function log(...args) {
-    console.log(":::", `[${new Date().toLocaleTimeString()}]`, ...args);
+    console.log(":::", ts(), ...args);
 }
 
 function log2(...args) {
-    console.log("\n", `[${new Date().toLocaleTimeString()}]`, ...args, "\n");
+    console.log("\n", ts(), ...args, "\n");
 }
 
 function logWithLines(...args) {

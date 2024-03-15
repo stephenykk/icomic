@@ -20,8 +20,10 @@ const {
 const helper = require("./common.js");
 const puppeteer = require("puppeteer");
 
+// yarn d junmoxie 9
 const MY_DEBUG = {
     isLogEachResponse: false,
+    downTimeoutSeconds: 22,
 };
 
 function getResourceUrl(refUrl, resourcePath) {
@@ -94,10 +96,14 @@ async function downPage(url, urlInfo = {}) {
     const listenOutputOne = (cb) => {
         if (!outputListeners.includes(cb)) outputListeners.push(cb);
     };
-    const outputOneCallback = async () => {
+    const outputOneCallback = async (msg) => {
         // outputListeners.forEach(cb => cb())
         if (outputCount >= expectCount) {
-            log2("before close browser! wait for a while");
+            log2(
+                "[outputOneCallback]",
+                msg,
+                "before close browser and resolve download promise"
+            );
             await sleep(2);
             // await browser.close();
             // await closeBrowser();
@@ -330,7 +336,7 @@ async function downPage(url, urlInfo = {}) {
                     );
                     await spawnCommand("curl", ["-o", outFile, location]);
 
-                    outputOneCallback();
+                    outputOneCallback(`REDIRECT status: ${status}`);
                     return false;
                 }
 
@@ -428,7 +434,9 @@ async function downPage(url, urlInfo = {}) {
                     await callback({ response, page, browser, helper, outDir });
                 }
 
-                outputOneCallback(isM3u8);
+                outputOneCallback(
+                    `AT END , wanted: ${wanted}, isM3u8: ${isM3u8}`
+                );
 
                 // clearTimeout(closeBrowserTimer);
                 // closeBrowserTimer = setTimeout(async() => {
@@ -465,7 +473,7 @@ async function downPage(url, urlInfo = {}) {
     setTimeout(() => {
         log2("======> TIME OUT, AND RESOLVE THE DOWNLOAD PROMISE");
         resolve(false);
-    }, 1000 * 50);
+    }, 1000 * MY_DEBUG.downTimeoutSeconds);
 
     // await page.waitForSelector(".avatar.userbtn");
     // await page.click(".avatar.userbtn");
