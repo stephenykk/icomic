@@ -23,7 +23,7 @@ const puppeteer = require("puppeteer");
 // yarn d junmoxie 9
 const MY_DEBUG = {
     isLogEachResponse: false,
-    downTimeoutSeconds: 22,
+    downTimeoutSeconds: 15,
 };
 
 function getResourceUrl(refUrl, resourcePath) {
@@ -104,7 +104,7 @@ async function downPage(url, urlInfo = {}) {
                 msg,
                 "before close browser and resolve download promise"
             );
-            await sleep(2);
+            // await sleep(2);
             // await browser.close();
             // await closeBrowser();
             await closeBrowser();
@@ -120,7 +120,7 @@ async function downPage(url, urlInfo = {}) {
     const closeBrowser = async () => {
         log2("WILL CLOSE BROWSER, gotoDone:", gotoDone);
 
-        await sleep(3);
+        await sleep(2);
 
         try {
             if (gotoDone) {
@@ -470,8 +470,9 @@ async function downPage(url, urlInfo = {}) {
 
     // ensure close browser
     // setTimeout(closeBrowser, 1000 * 50);
-    setTimeout(() => {
-        log2("======> TIME OUT, AND RESOLVE THE DOWNLOAD PROMISE");
+    setTimeout(async () => {
+        log2("======> TIME OUT, CLOSE BROWSER AND RESOLVE DOWNLOAD PROMISE");
+        await closeBrowser();
         resolve(false);
     }, 1000 * MY_DEBUG.downTimeoutSeconds);
 

@@ -36,6 +36,8 @@ class IComic {
     async start() {
         const ok = this.usage(action);
         ok && this[action]();
+
+        log("AT THE END OF comic.start()");
     }
 
     cartoonListUsage(action) {

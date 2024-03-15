@@ -16,7 +16,7 @@ function isUrl(str) {
 }
 
 function ts() {
-    const time = new Date().toLocaleString();
+    const time = new Date().toLocaleTimeString();
     return `[${time.replace(/^\d+:/, "")}]`;
 }
 
