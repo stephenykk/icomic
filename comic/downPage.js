@@ -20,6 +20,10 @@ const {
 const helper = require("./common.js");
 const puppeteer = require("puppeteer");
 
+const MY_DEBUG = {
+    isLogEachResponse: false,
+};
+
 function getResourceUrl(refUrl, resourcePath) {
     let isUrl = /^http/.test(resourcePath);
 
@@ -93,7 +97,7 @@ async function downPage(url, urlInfo = {}) {
     const outputOneCallback = async () => {
         // outputListeners.forEach(cb => cb())
         if (outputCount >= expectCount) {
-            log2("before close browser!");
+            log2("before close browser! wait for a while");
             await sleep(2);
             // await browser.close();
             // await closeBrowser();
@@ -108,13 +112,14 @@ async function downPage(url, urlInfo = {}) {
     };
 
     const closeBrowser = async () => {
-        log2("WILL CLOSE BROWSER");
+        log2("WILL CLOSE BROWSER, gotoDone:", gotoDone);
 
-        await sleep(4);
+        await sleep(3);
 
         try {
             if (gotoDone) {
                 await browser.close();
+                log2("BROWSER CLOSE FINISHED!");
             } else {
                 closeBrowser();
             }
@@ -143,7 +148,9 @@ async function downPage(url, urlInfo = {}) {
     let gotoDone = false;
     const page = await browser.newPage();
     await page.setViewport({ width: 1400, height: 800 });
+
     const { root = "", nextBtn = "" } = config.detailPage.selector || {};
+
     const clickNextBtn = async function () {
         const selector = (root + " " + nextBtn).trim();
         if (!selector) return;
@@ -159,17 +166,16 @@ async function downPage(url, urlInfo = {}) {
             return true;
         }, selector);
     };
-
     nextBtn && listenOutputOne(clickNextBtn);
 
-    page.on("console", (msg) => log("console:", msg.text()));
-    page.on("pageerror", (error) => log2("error:", error));
+    // page.on("console", (msg) => log("console:", msg.text()));
+    page.on("pageerror", (error) => log2("on page error:", error));
 
     // page.on("framenavigated", (frame) => {
 
     let hasJumpFrame = false;
     page.on("frameattached", (frame) => {
-        log2("FRAME ATTACHED CALLBACK~~");
+        log2("FRAME ATTACHED CALLBACK~~, page.hasOutput:", page.hasOutput);
 
         // return;
 
@@ -238,14 +244,17 @@ async function downPage(url, urlInfo = {}) {
             if (typeof checkIsM3u8 === "function") {
                 isM3u8Mode = checkIsM3u8(response);
             }
-            log(
-                "MAIN-RESPONSE:",
-                status,
-                contentType,
-                "isM3u8Mode:",
-                isM3u8Mode,
-                resUrl
-            );
+
+            // :: log every response url and status
+            MY_DEBUG.isLogEachResponse &&
+                log(
+                    "MAIN-RESPONSE:",
+                    status,
+                    contentType,
+                    "isM3u8Mode:",
+                    isM3u8Mode,
+                    resUrl
+                );
 
             if (resUrl.includes(".m3u8")) {
                 log2("=========>>>> ON RESPONSE M3U8 resUrl:", resUrl);
@@ -309,11 +318,16 @@ async function downPage(url, urlInfo = {}) {
                 if (status === 302 || status === 301) {
                     wanted = false;
                     const location = response.headers()["location"];
-                    log2("----> 302 location:", location);
                     outputCount += 1;
                     fs.ensureDirSync(outDir);
                     const outFile = `${outDir}${path.sep}index.m3u8`;
                     page.hasOutput = true;
+                    log2(
+                        "1===------------> 302 location:",
+                        location,
+                        "outFile:",
+                        outFile
+                    );
                     await spawnCommand("curl", ["-o", outFile, location]);
 
                     outputOneCallback();
@@ -371,6 +385,7 @@ async function downPage(url, urlInfo = {}) {
                     }
 
                     page.hasOutput = true;
+                    log2("2===-------> before output:", resUrl, outDir);
                     await output(resUrl, buf, outDir);
                 }
 
@@ -404,6 +419,7 @@ async function downPage(url, urlInfo = {}) {
                                         resUrl
                                     );
                                     // update m3u8 file
+                                    log2("3===----------->", resUrl, outDir);
                                     await output(resUrl, newResData, outDir);
                                 }
                             }
@@ -444,11 +460,17 @@ async function downPage(url, urlInfo = {}) {
     // await sleep(2);
     log2("goto done!!");
 
+    // ensure close browser
+    // setTimeout(closeBrowser, 1000 * 50);
+    setTimeout(() => {
+        log2("======> TIME OUT, AND RESOLVE THE DOWNLOAD PROMISE");
+        resolve(false);
+    }, 1000 * 50);
+
     // await page.waitForSelector(".avatar.userbtn");
     // await page.click(".avatar.userbtn");
 
     isDownContent = isDownContent == null ? true : isDownContent;
-
     if (isDownContent) {
         const con = await page.content();
         // log('=====', con)
@@ -520,7 +542,7 @@ async function downPage(url, urlInfo = {}) {
         // console.log("detail config:", config);
     }, config);
 
-    console.log("🚀 ~ file: index.js:561  ~ jsResult:", jsResult);
+    log2("after page evaluate, jsResult:", jsResult);
 
     if (jsResult && jsResult.frameSrc) {
         log2("重定向到新的地址 ", jsResult.frameSrc);
@@ -535,6 +557,7 @@ async function downPage(url, urlInfo = {}) {
     //   await browser.close();
     // }, 5000);
 
+    log2("=====> before return download promise");
     return downPromise;
 }
 

@@ -197,8 +197,13 @@ class IComic {
         log2("downUrls:", downUrls);
 
         for (let url of downUrls) {
-            log(`--------- downloading ${config.output} ${url} ---------`);
+            log(
+                `========= start downloading ${config.output} ${url} =========`
+            );
             await downPage(url, urlInfos[url]);
+            log(
+                `========= finish downloading ${config.output} ${url} =========`
+            );
         }
     }
 }

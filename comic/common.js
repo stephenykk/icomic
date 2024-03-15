@@ -16,11 +16,11 @@ function isUrl(str) {
 }
 
 function log(...args) {
-    console.log(":::", ...args);
+    console.log(":::", `[${new Date().toLocaleTimeString()}]`, ...args);
 }
 
 function log2(...args) {
-    console.log("\n", ...args, "\n");
+    console.log("\n", `[${new Date().toLocaleTimeString()}]`, ...args, "\n");
 }
 
 function logWithLines(...args) {
