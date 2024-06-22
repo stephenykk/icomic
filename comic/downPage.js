@@ -16,31 +16,14 @@ const {
     axios,
     download,
     output,
+    getResourceUrl,
 } = require("./common.js");
+
+const MY_DEBUG = require("../config/debug");
 const helper = require("./common.js");
 const puppeteer = require("puppeteer");
 
-// yarn d junmoxie 9
-const MY_DEBUG = {
-    isLogEachResponse: false,
-    downTimeoutSeconds: 15,
-};
-
-function getResourceUrl(refUrl, resourcePath) {
-    let isUrl = /^http/.test(resourcePath);
-
-    if (isUrl) return resourcePath;
-
-    const oUrl = urlTool.parse(refUrl);
-    if (resourcePath.startsWith("/")) {
-        oUrl.pathname = resourcePath;
-    } else {
-        oUrl.pathname = oUrl.pathname.replace(/\/[^/]*$/, "/") + resourcePath;
-    }
-
-    const resourceUrl = urlTool.format(oUrl);
-    return resourceUrl;
-}
+const CLOSE_TIMEOUT_SECONDS = 15;
 
 async function getRedirectUrl(resUrl, resourcePath) {
     const resourceUrl = getResourceUrl(resUrl, resourcePath);
@@ -120,14 +103,15 @@ async function downPage(url, urlInfo = {}) {
     const closeBrowser = async () => {
         log2("WILL CLOSE BROWSER, gotoDone:", gotoDone);
 
-        await sleep(2);
+        // await sleep(2);
 
         try {
             if (gotoDone) {
                 await browser.close();
                 log2("BROWSER CLOSE FINISHED!");
             } else {
-                closeBrowser();
+                setTimeout(closeBrowser, CLOSE_TIMEOUT_SECONDS * 1000);
+                // closeBrowser();
             }
         } catch (err) {
             log2("close browser error::", err);
@@ -135,6 +119,7 @@ async function downPage(url, urlInfo = {}) {
     };
 
     const browser = await puppeteer.launch({
+        ignoreHTTPSErrors: true,
         // product: 'firefox',
 
         // executablePath: '/usr/lib/chromium-browser/chromium-browser',
@@ -320,8 +305,35 @@ async function downPage(url, urlInfo = {}) {
                 let outDir = path.resolve(config.output, sn);
 
                 log2("====>>> GOT WANTED,", status, normalResUrl);
+                let buf = null;
+                let resBody = null;
+                if (isMp4) {
+                    buf = false;
+                } else {
+                    try {
+                        buf = await response.buffer();
+                        resBody = buf.toString("utf8");
+                    } catch (err) {
+                        log2("response.buffer() got some error::", err);
+                    }
+                }
+                let realM3u8Url = null;
+                if (resBody) {
+                    const m3u8Line = resBody
+                        .split("\r\n")
+                        .join("\n")
+                        .split("\n")
+                        .find(
+                            (line, i) =>
+                                i < 12 && /.*\.m3u8(?:\?[^\?]+)?$/.test(line)
+                        );
+                    if (m3u8Line) {
+                        realM3u8Url = getResourceUrl(normalResUrl, m3u8Line);
+                    }
+                }
 
-                if (status === 302 || status === 301) {
+                const isRedirectStatus = status === 302 || status === 301;
+                if (isRedirectStatus) {
                     wanted = false;
                     const location = response.headers()["location"];
                     outputCount += 1;
@@ -329,7 +341,7 @@ async function downPage(url, urlInfo = {}) {
                     const outFile = `${outDir}${path.sep}index.m3u8`;
                     page.hasOutput = true;
                     log2(
-                        "1===------------> 302 location:",
+                        `1===------------>302 location:`,
                         location,
                         "outFile:",
                         outFile
@@ -342,16 +354,7 @@ async function downPage(url, urlInfo = {}) {
 
                 log("on reponse file, getting buffer:", resFile);
                 // let buf = isMp4 ? false : await response.buffer();
-                let buf = null;
-                if (isMp4) {
-                    buf = false;
-                } else {
-                    try {
-                        buf = await response.buffer();
-                    } catch (err) {
-                        log2("response.buffer() got some error::", err);
-                    }
-                }
+
                 // log(resFile, 'CONTENT:', buf.toString('utf8'))
                 const defConCheck = function (con) {
                     return (
@@ -359,11 +362,11 @@ async function downPage(url, urlInfo = {}) {
                     );
                 };
                 conCheck = conCheck || defConCheck;
-                if (!isMp4 && buf && conCheck) {
+                if (!isMp4 && !realM3u8Url && buf && conCheck) {
                     // check content, ensure it is wanted response
-                    let conOK = conCheck(buf.toString("utf8"));
+                    let conOK = conCheck(resBody);
                     if (!conOK) {
-                        buf = "URL IS:" + "\n" + resUrl + "\n" + buf.toString();
+                        buf = "URL IS:" + "\n" + resUrl + "\n" + resBody;
                         wanted = false;
                         log2("m3u8 content not ok..., and will close browser");
                         closeBrowser();
@@ -431,6 +434,7 @@ async function downPage(url, urlInfo = {}) {
                             }
                         }
                     }
+
                     await callback({ response, page, browser, helper, outDir });
                 }
 

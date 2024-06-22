@@ -25,11 +25,23 @@ function autoCout() {
 
         if [ -d "cartoon/$dir/$n/dec" ]
         then
-            echo ":: CMD -> " yarn cout $dir/$n/dec
-            yarn cout $dir/$n/dec
+            if [ -f "cartoon/$dir/$n/dec"/*mp4 ]
+            then
+                echo ":: mp4 exists already"
+                ls -lh "cartoon/$dir/$n/dec"/*mp4
+            else
+                echo ":: CMD -> " yarn cout $dir/$n/dec
+                yarn cout $dir/$n/dec
+            fi
         else
-            echo ":: CMD -> " yarn cout $dir/$n
-            yarn cout $dir/$n
+            if [ -f "cartoon/$dir/$n"/*mp4 ]
+            then
+                echo ":: mp4 exists already"
+                ls -lh "cartoon/$dir/$n"/*mp4
+            else
+                echo ":: CMD -> " yarn cout $dir/$n
+                yarn cout $dir/$n
+            fi
         fi
     done
 }

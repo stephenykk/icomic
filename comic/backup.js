@@ -2,7 +2,7 @@ const path = require("path");
 const fs = require("fs-extra");
 
 // const backupRootDir = path.resolve(__dirname, "../backup");
-const backupRootDir = "J:\\cartoon";
+const backupRootDir = "K:\\cartoon";
 // console.log("🚀 ~ file: copy.js:6 ~ backupRootDir:", backupRootDir);
 const cartoonRootDir = path.resolve(__dirname, "../cartoon");
 

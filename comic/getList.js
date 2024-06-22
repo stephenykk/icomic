@@ -18,6 +18,7 @@ const {
     output,
 } = require("./common.js");
 const puppeteer = require("puppeteer");
+const MY_DEBUG = require("../config/debug.js");
 
 async function getList(skipCache) {
     if (!config.nocache && !skipCache) {
@@ -31,6 +32,7 @@ async function getList(skipCache) {
     const headless = "new";
     // const headless = false;
     const browser = await puppeteer.launch({
+        ignoreHTTPSErrors: true,
         executablePath:
             "C:\\Users\\pan\\AppData\\Local\\google\\Chrome\\Application\\chrome.exe",
 
@@ -50,7 +52,7 @@ async function getList(skipCache) {
     const page = await browser.newPage();
 
     page.on("console", (msg) => {
-        console.log("PAGE CONSOLE:", msg.text());
+        MY_DEBUG.isLogPageConsole && console.log("PAGE CONSOLE:", msg.text());
     });
 
     let { url, top } = config.listPage;
@@ -112,6 +114,7 @@ async function getList(skipCache) {
 
     // evaluate callback
     // 页面打开后，执行自定义回调，并传入config对象
+    log("BEFORE page.evaluate()....", config);
     let links = await page.evaluate((config) => {
         // console.log('========', JSON.stringify(config))
         console.log(
@@ -164,7 +167,7 @@ async function getList(skipCache) {
 
     log2(
         `===>>> GOT LINKS ${top ? "of top " + top : ""}:`,
-        top ? links.slice(0, top) : links
+        top ? links.slice(0, top) : links.slice(0, 3).push("...")
     );
 
     log2("WILL CLOSE BROWSER, headless:", headless);

@@ -2,6 +2,7 @@ const fs = require("fs-extra");
 const path = require("path");
 const { dirName } = require("./parseArgv");
 const axios = require("axios");
+const urlTool = require("url");
 
 axios.defaults.timeout = 40 * 1000;
 axios.defaults.headers["User-Agent"] =
@@ -65,10 +66,11 @@ async function download(
     url,
     outDir = "",
     responseType = "stream",
-    outputCallback
+    outputCallback,
+    wantedFileName = ""
 ) {
     log("downloading :", url);
-    let fname = path.basename(url);
+    let fname = wantedFileName || path.basename(url);
     // res is object, res.data is stream
     let res = await axios.get(url, { responseType }).catch((err) => {
         log2("DOWN FAIL:", fname, err.message);
@@ -80,7 +82,12 @@ async function download(
         return false;
     }
 
-    let outResult = await output(url, res.data, outDir, outputCallback);
+    let outResult = await output(
+        wantedFileName || url,
+        res.data,
+        outDir,
+        outputCallback
+    );
     return outResult;
 }
 
@@ -128,6 +135,25 @@ function output(fname, con, outDir, outputCallback) {
     });
 }
 
+function getResourceUrl(refUrl, resourcePath) {
+    let isUrl = /^http/.test(resourcePath);
+
+    if (isUrl) return resourcePath;
+
+    const oUrl = urlTool.parse(refUrl);
+    if (resourcePath.startsWith("/")) {
+        oUrl.pathname = resourcePath;
+    } else {
+        oUrl.pathname = oUrl.pathname.replace(/\/[^/]*$/, "/") + resourcePath;
+    }
+
+    // del search
+    oUrl.search = "";
+
+    const resourceUrl = decodeURIComponent(urlTool.format(oUrl));
+    return resourceUrl;
+}
+
 module.exports = {
     download,
     output,
@@ -141,4 +167,5 @@ module.exports = {
     log,
     log2,
     logWithLines,
+    getResourceUrl,
 };
