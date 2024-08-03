@@ -37,7 +37,7 @@
     "cdown": "cd cdown && npm run down",
     "cout": "cd cdown && npm run mp4",
     "cclear": "cd cdown && npm run clearTs",
-    "cback": "cd comic && node backup.js",
+    "cback": "npm run cclear && cd comic  && node backup.js",
     "cdecode": "cd cdown && npm run decode",
     "cdecout": "cd cdown && npm run decmp4",
     "fzdm": "node fzdm/fzdm.js",
