@@ -3,14 +3,13 @@ const fs = require("fs-extra");
 
 // const backupRootDir = path.resolve(__dirname, "../backup");
 const backupRootDir = "K:\\cartoon";
-// console.log("🚀 ~ file: copy.js:6 ~ backupRootDir:", backupRootDir);
 const cartoonRootDir = path.resolve(__dirname, "../cartoon");
 
 function getCartoonDir(name) {
     return path.join(cartoonRootDir, name);
 }
 
-function getSubFolders(root) {
+function getSubDirs(root) {
     const subFolders = fs.readdirSync(root).filter((fname) => {
         return (
             !fname.startsWith(".") &&
@@ -21,18 +20,39 @@ function getSubFolders(root) {
     return subFolders;
 }
 
-// const ls = getSubFolders(backupRootDir);
-// console.log("🚀 ~ file: copy.js:25 ~ ls:", ls);
+function walkDir(dir, cb) {
+    const sublist = fs.readdirSync(dir)
+    const files = sublist.filter(fname => !fname.startsWith('.') && fs.statSync(path.join(dir, fname)).isFile())
+    files.forEach(file => cb(path.join(dir, file)))
+    const folders = sublist.filter(fname => !fname.startsWith('.') && fs.statSync(path.join(dir, fname)).isDirectory())
+    for(const folder of folders) {
+        walkDir(path.join(dir, folder), cb)
+    }
+}
+
+function checkExistMp4(dir) {
+    let exists = false
+    const cb = (fpath) => {
+        if (/mp4$/.test(fpath.replace(/\?.*$/, ''))) {
+            exists = true
+        }
+    }
+
+    walkDir(dir, cb)
+
+    return exists;
+}
+
 
 function getCartoonData() {
-    const cartoonNames = getSubFolders(cartoonRootDir);
-    // const cartoonNames = getSubFolders(cartoonRootDir).filter((name) =>
+    const cartoonNames = getSubDirs(cartoonRootDir);
+    // const cartoonNames = getSubDirs(cartoonRootDir).filter((name) =>
     //     /heizi/.test(name)
     // );
 
     const cartoonData = cartoonNames.reduce((data, name) => {
         const dir = getCartoonDir(name);
-        data[name] = { name, dir, done: getSubFolders(dir) };
+        data[name] = { name, dir, done: getSubDirs(dir).filter(sn => checkExistMp4(path.join(dir, sn))) };
         return data;
     }, {});
 
@@ -44,18 +64,18 @@ function getCartoonData() {
 }
 
 function getSubFiles(root) {
-    return fs.readdirSync(root).filter((name) => !name.startsWith("."));
+    return fs.readdirSync(root).filter((name) => !name.startsWith(".") && fs.statSync(path.join(root, name)).isFile());
 }
 
-function delEmptySnFolder(root) {
-    const cartoonNames = getSubFolders(root);
+function delNoMp4SnFolder(root) {
+    const cartoonNames = getSubDirs(root);
     for (const cartoonName of cartoonNames) {
-        const snFolders = getSubFolders(path.join(root, cartoonName));
+        const snFolders = getSubDirs(path.join(root, cartoonName));
         for (const sn of snFolders) {
             const snDir = path.join(root, cartoonName, sn);
-            const files = getSubFiles(snDir);
-            if (!files.length) {
-                console.log("REMOVING EMPTY SN DIR:", snDir);
+            const existsMp4 = checkExistMp4(snDir);
+            if (!existsMp4) {
+                console.log("\n =================> REMOVING SN DIR WITHOUT MP4:", snDir , '\n');
                 fs.rmdirSync(snDir);
             }
         }
@@ -63,7 +83,7 @@ function delEmptySnFolder(root) {
 }
 
 function handleBackup() {
-    delEmptySnFolder(backupRootDir);
+    delNoMp4SnFolder(backupRootDir);
 
     const cartoonData = getCartoonData();
 
@@ -72,15 +92,15 @@ function handleBackup() {
         for (const sn of cartoon.done) {
             const backDir = path.join(backupRootDir, cartoon.name, sn);
             const srcDir = path.join(cartoonRootDir, cartoon.name, sn);
-            const existsInBackup = fs.existsSync(backDir);
+            const existsBackSnDir = fs.existsSync(backDir);
             if (mode === "back") {
-                if (!existsInBackup) {
+                if (!existsBackSnDir) {
                     fs.ensureDirSync(backDir);
                     console.log("COPYING SN:", srcDir, " --> ", backDir);
                     fs.copySync(srcDir, backDir);
                 }
             } else if (mode === "clear") {
-                if (existsInBackup) {
+                if (existsBackSnDir) {
                     const ok = rmMp4(srcDir);
                     if (!ok) {
                         const decDir = path.join(srcDir, "dec");
