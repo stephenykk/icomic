@@ -21,28 +21,35 @@ function getSubDirs(root) {
 }
 
 function walkDir(dir, cb) {
-    const sublist = fs.readdirSync(dir)
-    const files = sublist.filter(fname => !fname.startsWith('.') && fs.statSync(path.join(dir, fname)).isFile())
-    files.forEach(file => cb(path.join(dir, file)))
-    const folders = sublist.filter(fname => !fname.startsWith('.') && fs.statSync(path.join(dir, fname)).isDirectory())
-    for(const folder of folders) {
-        walkDir(path.join(dir, folder), cb)
+    const sublist = fs.readdirSync(dir);
+    const files = sublist.filter(
+        (fname) =>
+            !fname.startsWith(".") &&
+            fs.statSync(path.join(dir, fname)).isFile()
+    );
+    files.forEach((file) => cb(path.join(dir, file)));
+    const folders = sublist.filter(
+        (fname) =>
+            !fname.startsWith(".") &&
+            fs.statSync(path.join(dir, fname)).isDirectory()
+    );
+    for (const folder of folders) {
+        walkDir(path.join(dir, folder), cb);
     }
 }
 
 function checkExistMp4(dir) {
-    let exists = false
+    let exists = false;
     const cb = (fpath) => {
-        if (/mp4$/.test(fpath.replace(/\?.*$/, ''))) {
-            exists = true
+        if (/mp4$/.test(fpath.replace(/\?.*$/, ""))) {
+            exists = true;
         }
-    }
+    };
 
-    walkDir(dir, cb)
+    walkDir(dir, cb);
 
     return exists;
 }
-
 
 function getCartoonData() {
     const cartoonNames = getSubDirs(cartoonRootDir);
@@ -52,7 +59,13 @@ function getCartoonData() {
 
     const cartoonData = cartoonNames.reduce((data, name) => {
         const dir = getCartoonDir(name);
-        data[name] = { name, dir, done: getSubDirs(dir).filter(sn => checkExistMp4(path.join(dir, sn))) };
+        const all = getSubDirs(dir);
+        data[name] = {
+            name,
+            dir,
+            all,
+            done: all.filter((sn) => checkExistMp4(path.join(dir, sn))),
+        };
         return data;
     }, {});
 
@@ -64,7 +77,13 @@ function getCartoonData() {
 }
 
 function getSubFiles(root) {
-    return fs.readdirSync(root).filter((name) => !name.startsWith(".") && fs.statSync(path.join(root, name)).isFile());
+    return fs
+        .readdirSync(root)
+        .filter(
+            (name) =>
+                !name.startsWith(".") &&
+                fs.statSync(path.join(root, name)).isFile()
+        );
 }
 
 function delNoMp4SnFolder(root) {
@@ -75,8 +94,13 @@ function delNoMp4SnFolder(root) {
             const snDir = path.join(root, cartoonName, sn);
             const existsMp4 = checkExistMp4(snDir);
             if (!existsMp4) {
-                console.log("\n =================> REMOVING SN DIR WITHOUT MP4:", snDir , '\n');
-                fs.rmdirSync(snDir);
+                console.log(
+                    "\n =================> REMOVING SN DIR WITHOUT MP4:",
+                    snDir,
+                    "\n"
+                );
+                // fs.rmdirSync(snDir); // default not recursive
+                fs.rmSync(snDir, { recursive: true, force: true });
             }
         }
     }
@@ -108,6 +132,21 @@ function handleBackup() {
                             rmMp4(decDir);
                         }
                     }
+                }
+            }
+        }
+        // find out download filed sn list of each cartoon
+        for (const sn of cartoon.all) {
+            const backDir = path.join(backupRootDir, cartoon.name, sn);
+            const srcDir = path.join(cartoonRootDir, cartoon.name, sn);
+            const existsBackSnDir = fs.existsSync(backDir);
+            if (mode === "back") {
+                if (!existsBackSnDir) {
+                    console.log(
+                        "\n ==========> NEED TO DOWN SN:",
+                        srcDir,
+                        "\n"
+                    );
                 }
             }
         }
