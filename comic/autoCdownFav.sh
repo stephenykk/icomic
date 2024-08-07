@@ -90,9 +90,10 @@ export -f getFirst
 export -f getLast
 export -f mockDown
 
-CONCURRENT_NUM=3
 
+# process 3 fav at the same time
 function autoCdownFav() {
+    local CONCURRENT_NUM=3
     usage 0 ${#@} "bash autoCdownFav.sh" || return 1
 
     local allDirs=`cat ./output/fav.txt`
