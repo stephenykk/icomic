@@ -34,6 +34,7 @@
     "autoNewer": "bash comic/autoNewer.sh || bash comic/autoNewer.sh",
     "autoAll_back": "yarn autoNewer && yarn autoDown && yarn autoCdownFav && yarn autoCoutFav",
     "autoAll": "yarn autoNewer && yarn autoDown && yarn autoCartoonFav",
+    "autoneeds": "node ./comic/autoCartoonNeed.js",
     "cfavs": "node index.js cartoonList ",
     "cdown": "cd cdown && npm run down",
     "cout": "cd cdown && npm run mp4",
