@@ -110,6 +110,7 @@ function handleBackup() {
     delNoMp4SnFolder(backupRootDir);
 
     const cartoonData = getCartoonData();
+    const needDownData = {};
 
     for (const cartoon of Object.values(cartoonData)) {
         // console.log(cartoon);
@@ -142,6 +143,9 @@ function handleBackup() {
             const existsBackSnDir = fs.existsSync(backDir);
             if (mode === "back") {
                 if (!existsBackSnDir) {
+                    needDownData[cartoon.name] = needDownData[cartoon.name] || { name: cartoon.name, dir: cartoon.dir, needs: []}
+                    needDownData[cartoon.name].needs.push(sn)
+
                     console.log(
                         "\n ==========> NEED TO DOWN SN:",
                         srcDir,
@@ -151,6 +155,10 @@ function handleBackup() {
             }
         }
     }
+
+    const needDownJsonFile = path.join(cartoonRootDir, '../comic/needDown.json')
+    fs.outputJsonSync(needDownJsonFile, needDownData);
+    console.log('\n=====>OUTPUT NEED DOWN DATA TO: ', needDownJsonFile , '\n\n')
 }
 
 function rmMp4(srcDir) {
