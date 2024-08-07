@@ -13,6 +13,7 @@
     
     "f": "npm run cfavs",
     "aa": "npm run autoAll",
+    "aan": "npm run autoAllNeeds",
     "an": "npm run autoNewer",
     "nl": "npm run newerList",
     "ad": "npm run autoDown",
@@ -34,7 +35,7 @@
     "autoNewer": "bash comic/autoNewer.sh || bash comic/autoNewer.sh",
     "autoAll_back": "yarn autoNewer && yarn autoDown && yarn autoCdownFav && yarn autoCoutFav",
     "autoAll": "yarn autoNewer && yarn autoDown && yarn autoCartoonFav",
-    "autoneeds": "node ./comic/autoCartoonNeed.js",
+    "autoAllNeeds": "node ./comic/autoCartoonNeed.js",
     "cfavs": "node index.js cartoonList ",
     "cdown": "cd cdown && npm run down",
     "cout": "cd cdown && npm run mp4",

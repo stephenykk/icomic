@@ -1,0 +1,77 @@
+{
+    "dawangraoming": {
+        "name": "dawangraoming",
+        "dir": "E:\\icomic\\cartoon\\dawangraoming",
+        "needs": ["4"]
+    },
+    "dazhuzai": {
+        "name": "dazhuzai",
+        "dir": "E:\\icomic\\cartoon\\dazhuzai",
+        "needs": ["51"]
+    },
+    "jiandao": {
+        "name": "jiandao",
+        "dir": "E:\\icomic\\cartoon\\jiandao",
+        "needs": ["32", "34"]
+    },
+    "quanzhigaoshou": {
+        "name": "quanzhigaoshou",
+        "dir": "E:\\icomic\\cartoon\\quanzhigaoshou",
+        "needs": ["10", "11", "5", "6", "7", "8", "9"]
+    },
+    "shengzu": {
+        "name": "shengzu",
+        "dir": "E:\\icomic\\cartoon\\shengzu",
+        "needs": ["14"]
+    },
+    "shenjilongwei": {
+        "name": "shenjilongwei",
+        "dir": "E:\\icomic\\cartoon\\shenjilongwei",
+        "needs": ["1"]
+    },
+    "shenlanqiyu": {
+        "name": "shenlanqiyu",
+        "dir": "E:\\icomic\\cartoon\\shenlanqiyu",
+        "needs": ["25", "26", "27", "28", "29", "30", "31", "32"]
+    },
+    "shenlongxingzhu": {
+        "name": "shenlongxingzhu",
+        "dir": "E:\\icomic\\cartoon\\shenlongxingzhu",
+        "needs": ["30", "38"]
+    },
+    "shenyinwangzuo": {
+        "name": "shenyinwangzuo",
+        "dir": "E:\\icomic\\cartoon\\shenyinwangzuo",
+        "needs": ["32", "71"]
+    },
+    "shenzang": {
+        "name": "shenzang",
+        "dir": "E:\\icomic\\cartoon\\shenzang",
+        "needs": ["2", "8"]
+    },
+    "shixiong": {
+        "name": "shixiong",
+        "dir": "E:\\icomic\\cartoon\\shixiong",
+        "needs": ["44", "46"]
+    },
+    "swallow": {
+        "name": "swallow",
+        "dir": "E:\\icomic\\cartoon\\swallow",
+        "needs": ["128", "130", "92"]
+    },
+    "xinghaiqishi": {
+        "name": "xinghaiqishi",
+        "dir": "E:\\icomic\\cartoon\\xinghaiqishi",
+        "needs": ["14"]
+    },
+    "yinianyongheng": {
+        "name": "yinianyongheng",
+        "dir": "E:\\icomic\\cartoon\\yinianyongheng",
+        "needs": ["8"]
+    },
+    "yinshizongmen": {
+        "name": "yinshizongmen",
+        "dir": "E:\\icomic\\cartoon\\yinshizongmen",
+        "needs": ["24"]
+    }
+}
