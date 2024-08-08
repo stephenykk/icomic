@@ -24,7 +24,7 @@ async function getList(skipCache) {
     if (!config.nocache && !skipCache) {
         let cached = getCacheList();
         if (cached) {
-            log("GET LIST FROM CACHE", cached);
+            log("GET LIST FROM CACHE", cached.slice(0, 3), "...\n");
             return cached;
         }
     }
@@ -114,7 +114,7 @@ async function getList(skipCache) {
 
     // evaluate callback
     // 页面打开后，执行自定义回调，并传入config对象
-    log("BEFORE page.evaluate()....", config);
+    // log("BEFORE page.evaluate()....", config);
     let links = await page.evaluate((config) => {
         // console.log('========', JSON.stringify(config))
         console.log(

@@ -124,7 +124,7 @@ class IComic {
         const newestLinkInfo = Object.values(linkInfos)
             .sort((infoA, infoB) => infoA.sn * 1 - infoB.sn * 1)
             .pop();
-        log2("newestLinkInfo:", newestLinkInfo);
+        // log2("newestLinkInfo:", newestLinkInfo);
 
         if (!newestLinkInfo) {
             return;

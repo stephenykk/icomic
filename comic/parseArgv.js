@@ -51,7 +51,7 @@ const args = {
 };
 
 console.log("-".repeat(60));
-console.log("PARSE ARGS:", args);
+// console.log("PARSE ARGS:", args);
 console.log("-".repeat(60));
 
 module.exports = args;

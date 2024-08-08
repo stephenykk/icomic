@@ -55,10 +55,7 @@ function getSubFiles(root) {
 
 function listNewer() {
     const newCartoonData = getNewCartoonData();
-    console.log(
-        "🚀 ~ file: listNewer.js:50 ~ listNewer ~ newCartoonData:",
-        newCartoonData
-    );
+    console.log("\n=========> listNewer newCartoonData:", newCartoonData, "\n");
 
     if (isDown) {
         const scripts = [];

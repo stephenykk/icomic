@@ -89,6 +89,8 @@ export -f autoCartoonMore
 export -f getFirst
 export -f getLast
 export -f mockDown
+export -f usage
+export -f autoCdownOne
 
 
 # process 3 fav at the same time

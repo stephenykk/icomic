@@ -51,7 +51,7 @@ async function main() {
         return;
     }
 
-    const CONCURRENT_COUNT = 3;
+    const CONCURRENT_COUNT = 4;
 
     const chunks = toChunks(needCartoons, CONCURRENT_COUNT);
     for (const chunk of chunks) {
