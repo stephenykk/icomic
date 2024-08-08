@@ -50,8 +50,8 @@ const args = {
     downSn,
 };
 
-console.log("-".repeat(60));
+// console.log("-".repeat(60));
 // console.log("PARSE ARGS:", args);
-console.log("-".repeat(60));
+// console.log("-".repeat(60));
 
 module.exports = args;
