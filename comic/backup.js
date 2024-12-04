@@ -2,7 +2,7 @@ const path = require("path");
 const fs = require("fs-extra");
 
 // const backupRootDir = path.resolve(__dirname, "../backup");
-const backupRootDir = "J:\\cartoon";
+const backupRootDir = "K:\\cartoon";
 const cartoonRootDir = path.resolve(__dirname, "../cartoon");
 
 function getCartoonDir(name) {
@@ -143,7 +143,7 @@ function handleBackup() {
             const existsBackSnDir = fs.existsSync(backDir);
             if (mode === "back") {
                 if (!existsBackSnDir) {
-                    needDownData[cartoon.name] = needDownData[cartoon.name] || { name: cartoon.name, dir: cartoon.dir, needs: []}
+                    needDownData[cartoon.name] = needDownData[cartoon.name] || { name: cartoon.name, dir: cartoon.dir, needs: [] }
                     needDownData[cartoon.name].needs.push(sn)
 
                     console.log(
@@ -158,7 +158,7 @@ function handleBackup() {
 
     const needDownJsonFile = path.join(cartoonRootDir, '../comic/needDown.json')
     fs.outputJsonSync(needDownJsonFile, needDownData);
-    console.log('\n=====>OUTPUT NEED DOWN DATA TO: ', needDownJsonFile , '\n\n')
+    console.log('\n=====>OUTPUT NEED DOWN DATA TO: ', needDownJsonFile, '\n\n')
 }
 
 function rmMp4(srcDir) {

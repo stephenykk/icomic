@@ -71,6 +71,7 @@ class IComic {
 
         let { top, isReverse, snList, totalRe } = config.listPage;
         let links = await getList(isSkipCache);
+        // console.log("🚀 ~ IComic ~ list ~ links:", links)
         if (isReverse) {
             links.reverse();
         }
@@ -121,12 +122,14 @@ class IComic {
     // 检查是否有更新的资源
     async checkNewer() {
         const { needLinks, linkInfos } = await this.list(true);
+        // console.log("🚀 ~ IComic ~ checkNewer ~ linkInfos:", linkInfos)
         const newestLinkInfo = Object.values(linkInfos)
             .sort((infoA, infoB) => infoA.sn * 1 - infoB.sn * 1)
             .pop();
         // log2("newestLinkInfo:", newestLinkInfo);
 
         if (!newestLinkInfo) {
+            log2('not any links found')
             return;
         }
 
@@ -138,14 +141,32 @@ class IComic {
                 fs.statSync(path.resolve(outDir, fname)).isDirectory()
             );
 
-        const maxDoneSn = !folderNames.length
+        const doneFolderNames = folderNames
+            .map((fname) => fname.match(/\d+/)?.[0] || 0)
+            .map((val) => val * 1)
+            .sort((a, b) => b - a)
+            .slice(0, 10)
+            .filter(
+                (fname) =>
+                    fs.existsSync(
+                        path.resolve(outDir, fname + '', "tslist.txt")
+                    ) ||
+                    fs.existsSync(
+                        path.resolve(outDir, fname + '', "dec/tslist.txt")
+                    ) ||
+                    fs.existsSync(
+                        path.resolve(outDir, fname + '', "out.mp4")
+                    ) ||
+                    fs.existsSync(
+                        path.resolve(outDir, fname + '', "index.mp4")
+                    )
+            )
+        const maxDoneSn = !doneFolderNames.length
             ? 0
             : Math.max.apply(
-                  Math,
-                  folderNames
-                      .map((fname) => fname.match(/\d+/)?.[0] || 0)
-                      .map((val) => val * 1)
-              );
+                Math,
+                doneFolderNames
+            );
         log2("maxDoneSn", maxDoneSn);
 
         const diff = newestLinkInfo.sn * 1 - maxDoneSn;

@@ -47,7 +47,8 @@
         "mytest:serve": "http-server puppeteerTest -p 8899",
         "mytest:main": "node puppeteerTest/test.js",
         "mytest": "npm-run-all -p mytest:*",
-        "push": "bash push.sh"
+        "push": "bash push.sh",
+        "conf": "node ./config/myindex"
     },
     "dependencies": {
         "agentkeepalive": "^4.5.0",

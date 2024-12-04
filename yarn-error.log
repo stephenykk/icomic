@@ -1,0 +1,96 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Users\pan\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js info
+
+PATH: 
+  C:\Users\pan\bin;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\local\bin;C:\Program Files\Git\usr\bin;C:\Program Files\Git\usr\bin;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Users\pan\bin;C:\Program Files (x86)\VMware\VMware Workstation\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0;C:\Windows\System32\OpenSSH;C:\Program Files\Git\cmd;C:\Program Files\Microsoft VS Code\bin;C:\Program Files\IDM Computer Solutions\UltraEdit;C:\Program Files\IDM Computer Solutions\UltraCompare;C:\Users\pan\AppData\Roaming\nvm;C:\Program Files\nodejs;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;C:\Program Files\MySQL\MySQL Shell 8.0\bin;C:\Program Files\MySQL\MySQL Server 5.7\bin;C:\Users\pan\AppData\Local\pnpm;D:\xampp\php;C:\Users\pan\AppData\Local\Yarn\bin;C:\Users\pan\AppData\Roaming\npm;D:\shortcuts;C:\Users\pan\AppData\Local\Programs\Python\Python39\Scripts;C:\Users\pan\AppData\Local\Programs\Python\Python39;C:\Users\pan\AppData\Local\Microsoft\WindowsApps;D:\software\ffmpeg-master-latest-win64-gpl-shared\ffmpeg-master-latest-win64-gpl-shared\bin;D:\software\nginx-1.20.1;C:\Users\pan\AppData\Roaming\nvm;C:\Program Files\nodejs;C:\Program Files\Git\usr\bin\vendor_perl;C:\Program Files\Git\usr\bin\core_perl
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  20.10.0
+
+Platform: 
+  win32 x64
+
+Trace: 
+  TypeError: Cannot convert undefined or null to object
+      at keys (<anonymous>)
+      at Object.<anonymous> (C:\Users\pan\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:84781:59)
+      at Generator.next (<anonymous>)
+      at step (C:\Users\pan\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:310:30)
+      at C:\Users\pan\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:321:13
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+npm manifest: 
+  {
+      "name": "icomic",
+      "version": "1.0.0",
+      "main": "index.js",
+      "scripts": {
+          "n": "npm run newer",
+          "d": "npm run down",
+          "m": "npm run autoCartoon",
+          "dm": "bash comic/dm.sh",
+          "o": "npm run autoCout",
+          "f": "npm run cfavs",
+          "aa": "npm run autoAll",
+          "aan": "npm run autoAllNeeds",
+          "an": "npm run autoNewer",
+          "nl": "npm run newerList",
+          "nd": "npm run needDownList",
+          "ad": "npm run autoDown",
+          "am": "npm run autoCartoonFav",
+          "at": "npm run autoCdownFav",
+          "c": "npm run cclear",
+          "newer": "node index.js checkNewer",
+          "newerList": "node comic/listNewer.js",
+          "needDownList": "node comic/listNeedDown.js",
+          "down": "node index.js download",
+          "autoCdown": "bash comic/autoCdown.sh || bash comic/autoCdown.sh",
+          "autoCdownFav": "bash comic/autoCdownFav.sh",
+          "autoCout": "bash comic/autoCout.sh",
+          "autoCoutFav": "bash comic/autoCoutFav.sh",
+          "autoCartoon": "bash comic/autoCartoon.sh",
+          "autoCartoonFavOld": "yarn autoCdownFav && yarn autoCoutFav",
+          "autoCartoonFav": "bash comic/autoCartoonFav.sh",
+          "autoDown": "bash comic/autoDown.sh",
+          "autoNewer": "bash comic/autoNewer.sh || bash comic/autoNewer.sh",
+          "autoAll_back": "yarn autoNewer && yarn autoDown && yarn autoCdownFav && yarn autoCoutFav",
+          "autoAll": "yarn autoNewer && yarn autoDown && yarn autoCartoonFav",
+          "autoAllNeeds": "node ./comic/autoCartoonNeed.js",
+          "cfavs": "node index.js cartoonList ",
+          "cdown": "cd cdown && npm run down",
+          "cout": "cd cdown && npm run mp4",
+          "cclear": "cd cdown && npm run clearTs",
+          "cback": "npm run cclear && cd comic  && node backup.js",
+          "cdecode": "cd cdown && npm run decode",
+          "cdecout": "cd cdown && npm run decmp4",
+          "fzdm": "node fzdm/fzdm.js",
+          "mlist": "node index.js list",
+          "example": "node index.js download hello ",
+          "mytest:serve": "http-server puppeteerTest -p 8899",
+          "mytest:main": "node puppeteerTest/test.js",
+          "mytest": "npm-run-all -p mytest:*",
+          "push": "bash push.sh",
+          "info": "node ./config/myindex"
+      },
+      "dependencies": {
+          "agentkeepalive": "^4.5.0",
+          "axios": "^0.20.0",
+          "fs-extra": "^9.0.1",
+          "got": "11.6.2",
+          "jsdom": "^22.1.0",
+          "puppeteer": "^21.0.3",
+          "puppeteer-interceptor": "^2.2.0"
+      },
+      "devDependencies": {
+          "npm-run-all": "^4.1.5"
+      }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
