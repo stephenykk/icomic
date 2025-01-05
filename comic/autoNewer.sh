@@ -25,7 +25,16 @@ function autoNewer() {
     # for dirName in `cat ./output/fav.tmp`
     do
         echo yarn newer $dirName
-        yarn newer $dirName || return 1
+        # yarn newer $dirName || return 1
+        yarn newer $dirName
+        if [ "$?" -gt 0 ]; then
+            echo "~~~~~CHECK $dirName NEWER FAIL~~~~~~"
+        else
+            echo "~~~~~CHECK $dirName NEWER SUCCESS~~~~~~"
+        fi
+
+        echo -e "\n\n"
+
     done
 
     sleep 2

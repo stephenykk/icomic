@@ -2,6 +2,7 @@ const fs = require("fs-extra");
 const path = require("path");
 const configModule = require("./config/index.js");
 const config = configModule.data;
+const { DEBUG_LIST } = configModule
 const {
     listJsonFilePath,
     log,
@@ -11,6 +12,7 @@ const {
 const getList = require("./comic/getList.js");
 const downPage = require("./comic/downPage.js");
 const { action, dirName, skipCache } = require("./comic/parseArgv.js");
+
 
 // if (dirName.includes("/")) {
 //     log2("PLEASE INPUT COMIC NAME, NOT PATH");
@@ -71,13 +73,15 @@ class IComic {
 
         let { top, isReverse, snList, totalRe } = config.listPage;
         let links = await getList(isSkipCache);
-        // console.log("🚀 ~ IComic ~ list ~ links:", links)
+        if (DEBUG_LIST) {
+            console.log("🚀 ~ IComic ~ list ~ links:", links, 'isSkipCache:', isSkipCache)
+        }
         if (isReverse) {
             links.reverse();
         }
 
-        const getSN = (text) => {
-            const matched = text.match(/\d+/);
+        const getSN = (text, link) => {
+            const matched = text.match(/\d+/) || (!text.includes('..') && link.match(/\d+(?=\D*?$)/));
             return matched ? matched[0] * 1 : null;
         };
 
@@ -91,7 +95,7 @@ class IComic {
 
         const linkInfos = links.reduce((infos, linkData) => {
             let [link, text = ""] = linkData;
-            const sn = getSN(text);
+            const sn = getSN(text, link);
             const total = getTotal(text);
             return Object.assign(infos, { [link]: { link, text, sn, total } });
         }, {});
@@ -103,7 +107,7 @@ class IComic {
             // link.text parse sn, sn in wanted list , and then put into needLinks
             links = links.filter((arr) => {
                 let [link, text = ""] = arr;
-                const sn = getSN(text);
+                const sn = getSN(text, link);
                 if (sn == null) return false;
 
                 return snList.includes(sn);

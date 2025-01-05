@@ -52,7 +52,10 @@ function getConfig(name) {
     return comicConf;
 }
 
+const DEBUG_LIST = true
+
 module.exports = {
     data: getConfig(downName),
     getConfig,
+    DEBUG_LIST,
 };
